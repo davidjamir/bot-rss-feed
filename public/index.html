@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Server RSS BOT</title>
+    <style>
+      :root {
+        --text: #111;
+        --muted: #555;
+        --border: #e6e6e6;
+        --bg: #fff;
+        --bg-soft: #fafafa;
+        --get: #0066cc; /* blue */
+        --post: #c01818; /* red */
+      }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial;
+        color: var(--text);
+        background: var(--bg);
+        margin: 28px;
+        line-height: 1.55;
+      }
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      header {
+        padding: 18px 18px 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg-soft);
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 26px;
+        letter-spacing: -0.2px;
+      }
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      section {
+        margin-top: 18px;
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .table th,
+      .table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        text-align: left;
+        font-size: 14px;
+      }
+      .table th {
+        background: var(--bg-soft);
+        font-weight: 600;
+      }
+      .table tr:last-child td {
+        border-bottom: none;
+      }
+      .method {
+        font-weight: 700;
+        display: inline-block;
+        min-width: 54px;
+      }
+      .get {
+        color: var(--get);
+      }
+      .post {
+        color: var(--post);
+      }
+      .delete {
+        color: var(--text);
+      }
+      a {
+        color: var(--text);
+        text-decoration: underline;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          monospace;
+        font-size: 12px;
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      .note {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg-soft);
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .nowrap {
+        white-space: nowrap;
+      }
+
+      /* API link (blink on hover / click) */
+      a.api-link {
+        color: var(--text);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+        transition: color 140ms ease, background-color 140ms ease;
+        border-radius: 6px;
+        padding: 2px 4px;
+      }
+
+      a.api-link:hover {
+        color: var(--get); /* blue */
+        background: rgba(0, 102, 204, 0.08);
+      }
+
+      a.api-link:active {
+        color: var(--post); /* red */
+        background: rgba(192, 24, 24, 0.1);
+      }
+
+      a.api-link:focus-visible {
+        outline: 2px solid rgba(0, 102, 204, 0.35);
+        outline-offset: 2px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Server RSS BOT</h1>
+        <p class="sub">
+          Internal endpoints for the RSS Bot service: channel configuration,
+          scheduled jobs, parsing diagnostics, publish retry queue management,
+          and Telegram webhook delivery.
+        </p>
+        <p class="hint">
+          Note: opening an endpoint in a browser typically issues a
+          <span class="mono">GET</span> request. Use curl/Postman for
+          <span class="mono">POST</span> and <span class="mono">DELETE</span>.
+        </p>
+      </header>
+
+      <section>
+        <h2>API Endpoints</h2>
+
+        <table class="table" aria-label="API Endpoints">
+          <thead>
+            <tr>
+              <th class="nowrap">Method</th>
+              <th>Endpoint</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- /api/channel -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/channel"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/channel</a
+                >
+              </td>
+              <td>
+                Retrieve channel configurations stored in Redis.<br />
+                <b>Single channel</b>: pass <code>?id=&lt;chatId&gt;</code> or
+                <code>?chatId=&lt;chatId&gt;</code> (interchangeable).<br />
+                <b>List</b>: supports pagination via
+                <code>limit</code> (default: 10) and
+                <code>offset</code> (default: 0).
+              </td>
+            </tr>
+
+            <!-- /api/debug-parser -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/debug-parser?url="
+                  target="_blank"
+                  rel="noopener"
+                  >/api/debug-parser</a
+                >
+              </td>
+              <td>
+                Parser diagnostics for a specific RSS feed.<br />
+                Requires <code>url</code> (URL-encoded RSS feed URL).<br />
+                Returns the normalized, internal representation used by the
+                system.
+              </td>
+            </tr>
+
+            <!-- /api/publish-queue GET -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/publish-queue?limit=10"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/publish-queue</a
+                >
+              </td>
+              <td>
+                Inspect the publish retry queue (payloads that previously failed
+                and are pending retry).<br />
+                Optional: <code>limit</code> (default: 10).
+              </td>
+            </tr>
+
+            <!-- /api/publish-queue DELETE -->
+            <tr>
+              <td><span class="method delete">DELETE</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/publish-queue"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/publish-queue</a
+                >
+              </td>
+              <td>
+                Clear the publish retry queue by removing all queued payloads.
+              </td>
+            </tr>
+
+            <!-- /api/publish-retry -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/publish-retry"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/publish-retry</a
+                >
+              </td>
+              <td>
+                Trigger a retry run: forwards queued payloads to the configured
+                upstream endpoint.<br />
+                Optional: <code>limit</code> (default: 10).
+              </td>
+            </tr>
+
+            <!-- /api/jobs-queue -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/jobs-queue"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/jobs-queue</a
+                >
+              </td>
+              <td>
+                Inspect the sharded jobs queues used by the scalable RSS
+                worker.<br />
+                Shows each queue length and a small preview (first/next items),
+                useful for monitoring backlog and distribution across shards.
+              </td>
+            </tr>
+
+            <!-- /api/jobs-enqueue -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/jobs-enqueue"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/jobs-enqueue</a
+                >
+              </td>
+              <td>
+                Enqueue feed jobs for processing (one job per
+                <code>chatId|feedUrl</code>).<br />
+                Typically invoked periodically by a scheduler/worker to refresh
+                the jobs queues based on the current channel configuration.
+              </td>
+            </tr>
+
+            <!-- /api/drain -->
+            <tr>
+              <td><span class="method get">GET</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/jobs-drain?shard=0&amp;count=5"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/jobs-drain</a
+                >
+              </td>
+              <td>
+                Drain and process jobs from a single shard queue.<br />
+                Requires <code>shard</code> (0..N-1). Optional:
+                <code>count</code> (default: 5). Each drained job fetches the
+                RSS feed, posts updates to Telegram, and (in
+                <b>collect</b> mode) forwards publish payloads or enqueues
+                retries on failure.
+              </td>
+            </tr>
+
+            <!-- /api/telegram-webhook -->
+            <tr>
+              <td><span class="method post">POST</span></td>
+              <td>
+                <a
+                  class="api-link"
+                  href="/api/telegram-webhook"
+                  target="_blank"
+                  rel="noopener"
+                  >/api/telegram-webhook</a
+                >
+              </td>
+              <td>
+                Telegram webhook receiver. Telegram delivers updates via
+                <b>POST</b>, with the update JSON provided in the request body.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note">
+          <b>Authentication:</b> administrative/internal endpoints are typically
+          protected using
+          <code>Authorization: Bearer &lt;PUBLISH_SECRET&gt;</code>
+          (controlled by <code>REQUIRE_AUTH</code>).<br />
+          <b>Telegram webhook:</b> Telegram does not attach a custom Bearer
+          header automatically. For webhook verification, prefer Telegram’s
+          secret header <code>X-Telegram-Bot-Api-Secret-Token</code> or a secret
+          webhook path.
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

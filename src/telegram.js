@@ -1,0 +1,68 @@
+const { formatItem } = require("../helper/helperTelegram");
+
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+async function tg(method, payload) {
+  if (!BOT_TOKEN) throw new Error("Missing TELEGRAM_BOT_TOKEN");
+  const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload || {}),
+  });
+  const data = await r.json();
+  if (!data.ok)
+    throw new Error(`Telegram ${method} error: ${JSON.stringify(data)}`);
+  return data.result;
+}
+
+async function sendMessage(chat_id, text) {
+  return tg("sendMessage", {
+    chat_id,
+    text,
+    parse_mode: "HTML",
+    disable_web_page_preview: false,
+  });
+}
+
+async function getChat(chat_id) {
+  return tg("getChat", { chat_id });
+}
+
+// check quyền của user đối với chat/channel target
+async function getUserMember(targetChatId, userId) {
+  return tg("getChatMember", { chat_id: targetChatId, user_id: userId });
+}
+
+function isAdminLike(member) {
+  return member?.status === "administrator" || member?.status === "creator";
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function sendTelegram(payload) {
+  const chatId = payload.chatId;
+  const items = payload.items || [];
+  const source = payload.source || {};
+
+  if (!chatId || !items.length) return;
+
+  // gửi theo thứ tự cũ → mới
+  for (const item of items) {
+    const text = formatItem(item, source.feedTitle || "", source.feedUrl || "");
+
+    await sendMessage(chatId, text);
+
+    await sleep(200); // 200–500ms tuỳ mày
+  }
+}
+
+module.exports = {
+  tg,
+  sendMessage,
+  getChat,
+  getUserMember,
+  isAdminLike,
+  sendTelegram,
+};
