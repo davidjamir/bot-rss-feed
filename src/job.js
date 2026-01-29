@@ -141,6 +141,7 @@ async function collectBatchJob(jobKey = "") {
   const api = cfg.api || {};
   const topics = cfg.topics || [];
   const flags = cfg.flags || [];
+  const tags = cfg.tags || [];
   const targets = cfg.targets || [];
 
   let feed;
@@ -180,6 +181,7 @@ async function collectBatchJob(jobKey = "") {
     },
     topics,
     flags,
+    tags,
     targets,
     source: {
       feedUrl,

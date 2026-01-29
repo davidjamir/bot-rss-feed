@@ -44,6 +44,7 @@ module.exports = async (req, res) => {
         },
         topics: cfg.topics,
         flags: cfg.flags,
+        tags: cfg.tags,
         targets: cfg.targets,
       },
     });
@@ -92,9 +93,10 @@ module.exports = async (req, res) => {
         },
         topics: cfg.topics,
         flags: cfg.flags,
+        tags: cfg.tags,
         targets: cfg.targets,
       };
-    })
+    }),
   );
 
   return res.json({
