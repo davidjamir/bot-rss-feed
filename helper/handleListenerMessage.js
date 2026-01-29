@@ -20,7 +20,12 @@ function buildResponsetoTelegram({
 
   const lines = [];
 
-  lines.push(`<b>🔥🔥🔥🔥🔥 Notify 🔥🔥🔥🔥🔥</b>`);
+  lines.push(`<b>Notify System 🔥🔥🔥</b>`);
+  if (_page) lines.push(`Page: ${_page}`);
+  lines.push(`<b>Schedule:</b>`);
+  if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
+  if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
+
   if (link) lines.push(`<a href="${_link}"><b>${_title}</b></a>`);
   else lines.push(`<b>${title}</b>`);
 
@@ -28,11 +33,6 @@ function buildResponsetoTelegram({
     lines.push(`<b>Skipped</b>`);
     return lines.join("\n");
   }
-
-  if (_page) lines.push(`Page: ${_page}`);
-  lines.push(`<b>Schedule:</b>`);
-  if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
-  if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
 
   return lines.join("\n");
 }
