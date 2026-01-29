@@ -19,8 +19,11 @@ const {
   getFlags,
   removeFlag,
   addTarget,
-  listTargets,
+  getTargets,
   removeTarget,
+  addTag,
+  getTags,
+  removeTag,
 } = require("./channel");
 const {
   sendMessage,
@@ -55,12 +58,6 @@ function fmtFeeds(cfg) {
       return `#${i + 1}) ${tag}  ${url}`;
     })
     .join("\n");
-}
-
-function fmtTargets(cfg) {
-  const xs = Array.isArray(cfg.targets) ? cfg.targets : [];
-  if (!xs.length) return "Targets: <b>(not set)</b>";
-  return ["<b>Targets</b>", ...xs.map((x) => `• <code>${x}</code>`)].join("\n");
 }
 
 function parseTagList(arg) {
@@ -148,6 +145,12 @@ async function handleCommand(message) {
         "• <b>/listflags</b>   — show current flags",
         "• <b>/removeflag</b> flag   — remove one flag",
         "",
+        "<b>Tags</b>",
+        "Set tag keys for this chat/channel (stored as an array).",
+        "• <b>/addtag</b> key1 key2   — add one or many (space/comma separated)",
+        "• <b>/listtags</b>   — show current tags",
+        "• <b>/removetag</b> key   — remove one tag",
+        "",
         "<b>Targets</b>",
         "Set target keys for this chat/channel (stored as an array).",
         "• <b>/addtarget</b> key1 key2   — add one or many (space/comma separated)",
@@ -163,7 +166,7 @@ async function handleCommand(message) {
         "<b>/setapi https://publish.example.com [option - token]</b>",
         "<b>/settopic technology ai</b> or <b>/settopic technology,ai</b>",
         "<b>/setflag starred manual</b>",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 
@@ -184,7 +187,7 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/bind @channel</code> or <code>/bind -100xxxx</code>"
+        "Use <code>/bind @channel</code> or <code>/bind -100xxxx</code>",
       );
     }
 
@@ -204,7 +207,7 @@ async function handleCommand(message) {
       if (!isAdminLike(mem)) {
         return sendMessage(
           chatIdToReply,
-          "You are not admin/creator of channel/group, bind failed."
+          "You are not admin/creator of channel/group, bind failed.",
         );
       }
     } catch (e) {
@@ -217,7 +220,7 @@ async function handleCommand(message) {
       chatIdToReply,
       `OK, bind target successful: <b>${
         targetChat.title || targetChat.username || targetId
-      }</b>\nYou can use /addfeed /listfeeds...`
+      }</b>\nYou can use /addfeed /listfeeds...`,
     );
   }
 
@@ -226,7 +229,7 @@ async function handleCommand(message) {
   if (!targetChatId) {
     return sendMessage(
       chatIdToReply,
-      "Private Chat. Require <b>/bind @channel</b> before."
+      "Private Chat. Require <b>/bind @channel</b> before.",
     );
   }
 
@@ -235,7 +238,7 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <b>/setapi https://example.com/api/endpoint token</b>\nOr <b>/setapi https://example.com/api/endpoint</b> (token optional)."
+        "Use <b>/setapi https://example.com/api/endpoint token</b>\nOr <b>/setapi https://example.com/api/endpoint</b> (token optional).",
       );
     }
 
@@ -246,7 +249,7 @@ async function handleCommand(message) {
     if (!endpoint) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/setapi https://example.com/api/endpoint token (token optional)."
+        "Use <code>/setapi https://example.com/api/endpoint token (token optional).",
       );
     }
 
@@ -258,12 +261,12 @@ async function handleCommand(message) {
           "<b>API settings saved</b>",
           `• Endpoint: <b>${r.endpoint || endpoint}</b>`,
           `• Token: <b>${r.tokenMasked || "***"}</b>`,
-        ].join("\n")
+        ].join("\n"),
       );
     } catch (e) {
       return sendMessage(
         chatIdToReply,
-        `Failed to set API: <b>${String(e?.message || e)}</b>`
+        `Failed to set API: <b>${String(e?.message || e)}</b>`,
       );
     }
   }
@@ -282,7 +285,7 @@ async function handleCommand(message) {
           "",
           "Set it with:",
           "<b>/setapi https://example.com/api/endpoint 123</b>",
-        ].join("\n")
+        ].join("\n"),
       );
     }
 
@@ -295,7 +298,7 @@ async function handleCommand(message) {
         api.updatedAt ? `• Updated: <b>${api.updatedAt}</b>` : "",
       ]
         .filter(Boolean)
-        .join("\n")
+        .join("\n"),
     );
   }
 
@@ -307,7 +310,7 @@ async function handleCommand(message) {
       [
         "<b>API settings cleared</b>",
         "Collect mode will no longer POST to an API endpoint.",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 
@@ -316,7 +319,7 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <b>/setlisten https://example.com/api/endpoint token</b>\nOr <b>/setlisten https://example.com/api/endpoint</b> (token optional)."
+        "Use <b>/setlisten https://example.com/api/endpoint token</b>\nOr <b>/setlisten https://example.com/api/endpoint</b> (token optional).",
       );
     }
 
@@ -327,7 +330,7 @@ async function handleCommand(message) {
     if (!endpoint) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/setlisten https://example.com/api/endpoint token (token optional)."
+        "Use <code>/setlisten https://example.com/api/endpoint token (token optional).",
       );
     }
 
@@ -339,12 +342,12 @@ async function handleCommand(message) {
           "<b>Listen settings saved</b>",
           `• Endpoint: <b>${r.endpoint || endpoint}</b>`,
           `• Token: <b>${r.tokenMasked || "***"}</b>`,
-        ].join("\n")
+        ].join("\n"),
       );
     } catch (e) {
       return sendMessage(
         chatIdToReply,
-        `Failed to set Listen: <b>${String(e?.message || e)}</b>`
+        `Failed to set Listen: <b>${String(e?.message || e)}</b>`,
       );
     }
   }
@@ -362,7 +365,7 @@ async function handleCommand(message) {
           "",
           "Set it with:",
           "<b>/setlisten https://example.com/api/endpoint 123</b>",
-        ].join("\n")
+        ].join("\n"),
       );
     }
 
@@ -375,7 +378,7 @@ async function handleCommand(message) {
         listen.updatedAt ? `• Updated: <b>${listen.updatedAt}</b>` : "",
       ]
         .filter(Boolean)
-        .join("\n")
+        .join("\n"),
     );
   }
 
@@ -387,7 +390,7 @@ async function handleCommand(message) {
       [
         "<b>Listen settings cleared</b>",
         "Collect mode will no longer POST to an Listen endpoint.",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 
@@ -396,7 +399,7 @@ async function handleCommand(message) {
     if (!arg)
       return sendMessage(
         chatIdToReply,
-        "Use <code>/addfeed [notify|collect] https://site/rss</code>"
+        "Use <code>/addfeed [notify|collect] https://site/rss</code>",
       );
 
     const parts = arg.trim().split(/\s+/).filter(Boolean);
@@ -417,13 +420,13 @@ async function handleCommand(message) {
     if (!url)
       return sendMessage(
         chatIdToReply,
-        "Use <code>/addfeed [notify|collect] https://site/rss</code>"
+        "Use <code>/addfeed [notify|collect] https://site/rss</code>",
       );
     await addFeed(targetChatId, url, mode);
     const cfg = await getChannelConfig(targetChatId);
     return sendMessage(
       chatIdToReply,
-      `Added feed (${mode}).\n\n<b>Feeds:</b>\n${fmtFeeds(cfg)}`
+      `Added feed (${mode}).\n\n<b>Feeds:</b>\n${fmtFeeds(cfg)}`,
     );
   }
 
@@ -433,13 +436,13 @@ async function handleCommand(message) {
     if (!url)
       return sendMessage(
         chatIdToReply,
-        "Use <code>/removefeed https://site/rss</code>"
+        "Use <code>/removefeed https://site/rss</code>",
       );
     await removeFeed(targetChatId, url);
     const cfg = await getChannelConfig(targetChatId);
     return sendMessage(
       chatIdToReply,
-      `Removed feed.\n\n<b>Feeds:</b>\n${fmtFeeds(cfg)}`
+      `Removed feed.\n\n<b>Feeds:</b>\n${fmtFeeds(cfg)}`,
     );
   }
 
@@ -454,7 +457,7 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/settopic technology ai</code> or <code>/settopic technology,ai</code>"
+        "Use <code>/settopic technology ai</code> or <code>/settopic technology,ai</code>",
       );
     }
     const topics = parseTagList(arg);
@@ -462,7 +465,7 @@ async function handleCommand(message) {
     const current = await getTopics(targetChatId);
     return sendMessage(
       chatIdToReply,
-      ["<b>Topics updated</b>", fmtTagList("Topics", current)].join("\n")
+      ["<b>Topics updated</b>", fmtTagList("Topics", current)].join("\n"),
     );
   }
 
@@ -477,14 +480,14 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/removetopic technology</code>"
+        "Use <code>/removetopic technology</code>",
       );
     }
     await removeTopic(targetChatId, arg);
     const current = await getTopics(targetChatId);
     return sendMessage(
       chatIdToReply,
-      ["<b>Topic removed</b>", fmtTagList("Topics", current)].join("\n")
+      ["<b>Topic removed</b>", fmtTagList("Topics", current)].join("\n"),
     );
   }
 
@@ -493,7 +496,7 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/setflag starred manual</code> or <code>/setflag starred,manual</code>"
+        "Use <code>/setflag starred manual</code> or <code>/setflag starred,manual</code>",
       );
     }
     const flags = parseTagList(arg);
@@ -501,7 +504,7 @@ async function handleCommand(message) {
     const current = await getFlags(targetChatId);
     return sendMessage(
       chatIdToReply,
-      ["<b>Flags updated</b>", fmtTagList("Flags", current)].join("\n")
+      ["<b>Flags updated</b>", fmtTagList("Flags", current)].join("\n"),
     );
   }
 
@@ -520,7 +523,7 @@ async function handleCommand(message) {
     const current = await getFlags(targetChatId);
     return sendMessage(
       chatIdToReply,
-      ["<b>Flag removed</b>", fmtTagList("Flags", current)].join("\n")
+      ["<b>Flag removed</b>", fmtTagList("Flags", current)].join("\n"),
     );
   }
 
@@ -529,24 +532,24 @@ async function handleCommand(message) {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/addtarget key1 key2</code> or <code>/addtarget key1,key2</code>"
+        "Use <code>/addtarget key1 key2</code> or <code>/addtarget key1,key2</code>",
       );
     }
 
     const targets = parseTagList(arg); // reuse parseTagList
     await addTarget(targetChatId, targets);
 
-    const cfg = await getChannelConfig(targetChatId);
+    const current = await getTargets(targetChatId);
     return sendMessage(
       chatIdToReply,
-      ["<b>Targets updated</b>", fmtTargets(cfg)].join("\n")
+      ["<b>Targets updated</b>", fmtTagList("Targets", current)].join("\n"),
     );
   }
 
   // LISTTARGETS
   if (cmd === "/listtargets") {
-    const cfg = await getChannelConfig(targetChatId);
-    return sendMessage(chatIdToReply, fmtTargets(cfg));
+    const current = await getTargets(targetChatId);
+    return sendMessage(chatIdToReply, fmtTagList("Targets", current));
   }
 
   // REMOVETARGET: remove 1
@@ -556,11 +559,48 @@ async function handleCommand(message) {
     }
 
     await removeTarget(targetChatId, arg);
-    const cfg = await getChannelConfig(targetChatId);
+    const current = await getTargets(targetChatId);
 
     return sendMessage(
       chatIdToReply,
-      ["<b>Target removed</b>", fmtTargets(cfg)].join("\n")
+      ["<b>Target removed</b>", fmtTagList("Targets", current)].join("\n"),
+    );
+  }
+
+  // ADDTAG:  /addtarget a,b,c
+  if (cmd === "/addtag") {
+    if (!arg) {
+      return sendMessage(chatIdToReply, "Use <code>/addtag key1,key2</code>");
+    }
+
+    const tags = parseTagList(arg); // reuse parseTagList
+    await addTag(targetChatId, tags);
+
+    const current = await getTags(targetChatId);
+    return sendMessage(
+      chatIdToReply,
+      ["<b>Tags updated</b>", fmtTagList("Tags", current)].join("\n"),
+    );
+  }
+
+  // LISTTAGS
+  if (cmd === "/listtags") {
+    const current = await getTags(targetChatId);
+    return sendMessage(chatIdToReply, fmtTagList("Tags", current));
+  }
+
+  // REMOVETAG: remove 1
+  if (cmd === "/removetag") {
+    if (!arg) {
+      return sendMessage(chatIdToReply, "Use <code>/removetag key</code>");
+    }
+
+    await removeTag(targetChatId, arg);
+    const current = await getTags(targetChatId);
+
+    return sendMessage(
+      chatIdToReply,
+      ["<b>Target removed</b>", fmtTagList("Tags", current)].join("\n"),
     );
   }
 

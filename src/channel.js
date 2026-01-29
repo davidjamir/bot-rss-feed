@@ -54,6 +54,7 @@ async function getChannelConfig(chatId) {
       listen: {},
       topics: [],
       flags: [],
+      tags: [],
       targets: [],
     };
   }
@@ -74,6 +75,7 @@ async function saveChannelConfig(chatId, config) {
       config.listen && typeof config.listen === "object" ? config.listen : {},
     topics: Array.isArray(config.topics) ? normalizeList(config.topics) : [],
     flags: Array.isArray(config.flags) ? normalizeList(config.flags) : [],
+    tags: Array.isArray(config.tags) ? normalizeList(config.tags) : [],
     targets: Array.isArray(config.targets) ? normalizeList(config.targets) : [],
   };
 
@@ -283,7 +285,7 @@ async function addTarget(chatId, targets = []) {
   return cfg;
 }
 
-async function listTargets(chatId) {
+async function getTargets(chatId) {
   const cfg = await getChannelConfig(chatId);
   return Array.isArray(cfg.targets) ? cfg.targets : [];
 }
@@ -295,6 +297,35 @@ async function removeTarget(chatId, target) {
   if (!t) return cfg;
 
   cfg.targets = normalizeList((cfg.targets || []).filter((x) => x !== t));
+
+  await saveChannelConfig(chatId, cfg);
+  return cfg;
+}
+
+async function addTag(chatId, tags = []) {
+  const cfg = await getChannelConfig(chatId);
+
+  const keys = normalizeList(tags);
+  if (!keys.length) return cfg;
+
+  cfg.tags = normalizeList([...(cfg.tags || []), ...keys]);
+
+  await saveChannelConfig(chatId, cfg);
+  return cfg;
+}
+
+async function getTags(chatId) {
+  const cfg = await getChannelConfig(chatId);
+  return Array.isArray(cfg.tags) ? cfg.tags : [];
+}
+
+async function removeTag(chatId, tag) {
+  const cfg = await getChannelConfig(chatId);
+
+  const t = normTagorFlag(tag);
+  if (!t) return cfg;
+
+  cfg.tags = normalizeList((cfg.tags || []).filter((x) => x !== t));
 
   await saveChannelConfig(chatId, cfg);
   return cfg;
@@ -323,6 +354,9 @@ module.exports = {
   getFlags,
   removeFlag,
   addTarget,
-  listTargets,
+  getTargets,
   removeTarget,
+  addTag,
+  getTags,
+  removeTag,
 };
