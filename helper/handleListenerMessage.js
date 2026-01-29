@@ -60,14 +60,16 @@ async function handleListenerMessage(chatId, text) {
   const cfg = (await getChannelConfig(cid)) || {};
   const listen = cfg?.listen;
   const flags = cfg?.flags;
+  const tags = cfg?.tags;
   const endpoint = toStr(listen?.endpoint);
   const token = toStr(listen?.token);
   if (!endpoint) return null;
 
   const payload = {
     chatId: cid,
-    text: t,
     flags,
+    tags,
+    text: t,
   };
 
   const r = await postUpdateLinkToServer(endpoint, token, payload);
