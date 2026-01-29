@@ -220,7 +220,7 @@ async function batchesCron(limit = 10) {
 
   for (const batch of batches) {
     // ===== TELEGRAM =====
-    if (!batch.telegram?.sent) {
+    if (!batch.telegram?.sent && batch.telegram.failCount <= MAX_RETRY) {
       try {
         await sendTelegram(batch.payload);
         await onTelegramSuccess(batch);
@@ -236,7 +236,8 @@ async function batchesCron(limit = 10) {
     if (
       batch.mode === "collect" &&
       batch.telegram?.sent &&
-      !batch.server?.sent
+      !batch.server?.sent &&
+      batch.server.failCount <= MAX_RETRY
     ) {
       try {
         await sendServerWithRetry(batch.payload, 2);

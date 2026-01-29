@@ -106,9 +106,22 @@ function sanitizeUtf8(input) {
   return s;
 }
 
+function removeLinks(text) {
+  if (!text) return "";
+
+  return (
+    String(text)
+      // remove http / https links
+      .replace(/https?:\/\/[^\s)>\]"'}]+/gi, "")
+      // cleanup extra spaces
+      .replace(/\s{2,}/g, " ")
+      .trim()
+  );
+}
+
 function formatItem(item, feedTitle = "", feedUrl = "") {
   const rawTitle = toStr(item.title || "New post");
-  const title = esc(cutWithDots(rawTitle, TG_LIMITS.title));
+  const title = esc(cutWithDots(removeLinks(rawTitle), TG_LIMITS.title));
 
   const link = (item.link || "").trim();
   const safeLink = link ? cutWithDots(link, TG_LIMITS.link) : "";
@@ -117,7 +130,7 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
 
   const badge = hasFull ? "🔥🔥🔥🔥🔥 FULL 🔥🔥🔥🔥🔥" : "";
 
-  const rawDesc = item.snippet || "";
+  const rawDesc = removeLinks(item.snippet || "");
   const cleanedDesc = breakAutoLinks(
     stripHtml(cutPointerPrefixAnywhere(rawDesc)),
   ).trim();
