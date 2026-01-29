@@ -22,6 +22,8 @@ const parser = new Parser({
   },
 });
 
+const MAX_RETRY = 5;
+
 async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);

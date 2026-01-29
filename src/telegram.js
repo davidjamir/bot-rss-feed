@@ -6,7 +6,7 @@ async function tg(method, payload) {
   if (!BOT_TOKEN) throw new Error("Missing TELEGRAM_BOT_TOKEN");
   const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify(payload || {}),
   });
   const data = await r.json();
@@ -54,7 +54,7 @@ async function sendTelegram(payload) {
 
     await sendMessage(chatId, text);
 
-    await sleep(200); // 200–500ms tuỳ mày
+    await sleep(100); // 200–500ms tuỳ mày
   }
 }
 

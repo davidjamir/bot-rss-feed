@@ -96,6 +96,16 @@ function cutWithDots(s = "", max = 0) {
   return s.slice(0, Math.max(0, max - 1)) + "…";
 }
 
+function sanitizeUtf8(input) {
+  if (input == null) return input;
+  let s = String(input);
+  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+  s = s.replace(/[\uD800-\uDFFF]/g, "");
+  s = Buffer.from(s, "utf8").toString("utf8");
+
+  return s;
+}
+
 function formatItem(item, feedTitle = "", feedUrl = "") {
   const rawTitle = toStr(item.title || "New post");
   const title = esc(cutWithDots(rawTitle, TG_LIMITS.title));
@@ -145,7 +155,7 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
     msg = cutWithDots(msg, TG_LIMITS.total - 10);
   }
 
-  return msg;
+  return sanitizeUtf8(msg);
 }
 
 module.exports = { formatItem };
