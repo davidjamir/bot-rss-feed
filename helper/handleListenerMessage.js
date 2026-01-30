@@ -20,7 +20,7 @@ function buildResponsetoTelegram({
 
   const lines = [];
 
-  lines.push(`<b>Schedule Notify 🔥🔥🔥</b>`);
+  lines.push(`<b>🔥🔥🔥 Schedule Notify 🔥🔥🔥</b>`);
   if (_page) lines.push(`Page: ${_page}`);
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
