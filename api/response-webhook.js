@@ -22,8 +22,8 @@ module.exports = async (req, res) => {
     const timeBangkok = toStr(body.timeBangkok);
     const timeNewyork = toStr(body.timeNewyork);
 
-    if (!chatId || !text || !page) {
-      throw new Error("Missing chatId, page or text");
+    if (!chatId || !title || !page) {
+      throw new Error("Missing chatId, page or title");
     }
 
     const header = status
