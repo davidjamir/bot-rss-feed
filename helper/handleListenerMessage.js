@@ -20,13 +20,13 @@ function buildResponsetoTelegram({
 
   const lines = [];
 
-  lines.push(`<b>Notify System 🔥🔥🔥</b>`);
+  lines.push(`<b>Schedule Notify 🔥🔥🔥</b>`);
   if (_page) lines.push(`Page: ${_page}`);
-  lines.push(`<b>Schedule:</b>`);
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
 
-  if (link) lines.push(`<a href="${_link}"><b>${_title}</b></a>`);
+  if (link) lines.push(`<b>${_title}</b>`);
+  // if (link) lines.push(`<a href="${_link}"><b>${_title}</b></a>`);
   else lines.push(`<b>${title}</b>`);
 
   if (skipped) {
