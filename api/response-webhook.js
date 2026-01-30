@@ -16,6 +16,8 @@ module.exports = async (req, res) => {
 
     const chatId = toStr(body.chatId);
     const page = toStr(body.page);
+    const title = toStr(body.title);
+    const status = Boolean(body.status);
     const text = toStr(body.text);
     const timeBangkok = toStr(body.timeBangkok);
     const timeNewyork = toStr(body.timeNewyork);
@@ -24,12 +26,17 @@ module.exports = async (req, res) => {
       throw new Error("Missing chatId, page or text");
     }
 
+    const header = status
+      ? "🚀🚀🚀 New Post Published Successfully"
+      : "❌❌❌ Failed to Publish Post";
+
     const parts = [];
-    parts.push(`<b>Published Notify 🔥🔥🔥</b>`);
-    if (page) parts.push(`Page: ${page}`);
-    if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
-    if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
+    parts.push(`<b>${header}</b>`);
+    parts.push(`<b>${title}</b>`);
     if (text) parts.push(text);
+    if (page) parts.push(`Page: ${page}`);
+    if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
+    if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
 
     const message = parts.join("\n");
 
@@ -39,7 +46,6 @@ module.exports = async (req, res) => {
   } catch (e) {
     console.error("webhook error:", e?.message || e);
 
-    // ⚠️ Telegram / webhook: luôn trả 200 để tránh retry spam
     return res.status(200).json({ ok: true });
   }
 };
