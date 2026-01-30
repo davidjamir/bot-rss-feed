@@ -15,19 +15,15 @@ function buildResponsetoTelegram({
   timeNewyork,
 } = {}) {
   const _title = (title || "New post").trim();
-  const _link = (link || "").trim();
   const _page = (page || "").trim();
 
   const lines = [];
 
   lines.push(`<b>🔥🔥🔥 Schedule Notify 🔥🔥🔥</b>`);
-  if (_page) lines.push(`Page: ${_page}`);
+  lines.push(`<b>${_title}</b>`);
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
-
-  if (link) lines.push(`<b>${_title}</b>`);
-  // if (link) lines.push(`<a href="${_link}"><b>${_title}</b></a>`);
-  else lines.push(`<b>${title}</b>`);
+  if (_page) lines.push(`Page: ${_page}`);
 
   if (skipped) {
     lines.push(`<b>Skipped</b>`);
