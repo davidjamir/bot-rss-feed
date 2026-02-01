@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     }
 
     const header = status
-      ? "🚀🚀🚀 Success New Published 🔥🔥🔥"
+      ? "🚀🚀🚀 Success Published 🔥🔥🔥"
       : "❌❌❌ Failed Published 🔥🔥🔥";
 
     const parts = [];
