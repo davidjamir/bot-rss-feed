@@ -11,6 +11,7 @@ function buildResponsetoTelegram({
   page,
   title,
   link,
+  text,
   timeBangkok,
   timeNewyork,
 } = {}) {
@@ -21,14 +22,14 @@ function buildResponsetoTelegram({
 
   lines.push(`<b>🔥🔥🔥 Schedule Notify 🔥🔥🔥</b>`);
   lines.push(`<b>${_title}</b>`);
+  if (text) {
+    lines.push(`<b>Note: </b>${text}`);
+    return lines.join("\n");
+  }
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
   if (_page) lines.push(`Page: ${_page}`);
-
-  if (skipped) {
-    lines.push(`<b>Skipped</b>`);
-    return lines.join("\n");
-  }
+  if (skipped) lines.push(`<b>Skipped</b>`);
 
   return lines.join("\n");
 }
