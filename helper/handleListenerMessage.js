@@ -7,6 +7,7 @@ function toStr(x) {
 }
 
 function buildResponsetoTelegram({
+  status,
   skipped,
   page,
   title,
@@ -18,9 +19,13 @@ function buildResponsetoTelegram({
   const _title = (title || "New post").trim();
   const _page = (page || "").trim();
 
+  const header = status
+    ? "🔥🔥🔥 Schedule Notify 🔥🔥🔥"
+    : "❌❌❌ Schedule Notify ❌❌❌";
+
   const lines = [];
 
-  lines.push(`<b>🔥🔥🔥 Schedule Notify 🔥🔥🔥</b>`);
+  lines.push(`<b>${header}</b>`);
   lines.push(`<b>${_title}</b>`);
   if (text) {
     lines.push(`<b>Note: </b>${text}`);
