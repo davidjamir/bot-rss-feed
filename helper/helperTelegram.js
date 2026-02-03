@@ -68,21 +68,18 @@ function cutPointerPrefixAnywhere(snippet) {
   let s = toStr(snippet);
   if (!s) return "";
 
+  // normalize
   s = s
     .replace(/[\u0000-\u001F\u007F]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
-  const start = s.indexOf("*]:pointer");
-  if (start === -1) return s;
+  // remove any fragment like "*]:pointer...>"
+  s = s.replace(/\*?\]?:pointer[^>]*>/gi, " ");
 
-  const end = s.indexOf(">", start);
-  if (end === -1) return s.slice(0, start).trim(); // or "" nếu muốn bỏ luôn
-
-  return (s.slice(0, start) + " " + s.slice(end + 1))
-    .replace(/\s+/g, " ")
-    .trim();
+  return s.replace(/\s+/g, " ").trim();
 }
+
 const TG_LIMITS = {
   title: 400,
   desc: 600,
