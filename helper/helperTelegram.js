@@ -151,7 +151,7 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
   if (when) lines.push(`<i>🕒 ${esc(when)}</i>`);
   // meta
   const meta = [
-    feedTitle && esc(feedTitle),
+    feedTitle && esc(breakAutoLinks(feedTitle)),
     domain && esc(breakAutoLinks(domain)),
   ]
     .filter(Boolean)
