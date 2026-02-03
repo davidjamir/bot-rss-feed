@@ -32,7 +32,7 @@ function shouldCreatePost(item) {
   const title = (item.title || "").trim();
 
   if (!link) return false;
-  if (!title) return false;
+  if (!title || title.length < 20) return false;
 
   return true;
 }
