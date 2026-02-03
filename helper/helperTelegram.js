@@ -99,8 +99,8 @@ function cutWithDots(s = "", max = 0) {
 function sanitizeUtf8(input) {
   if (input == null) return input;
   let s = String(input);
-  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
-  s = s.replace(/[\uD800-\uDFFF]/g, "");
+  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+  // s = s.replace(/[\uD800-\uDFFF]/g, "");
   s = Buffer.from(s, "utf8").toString("utf8");
 
   return s;
