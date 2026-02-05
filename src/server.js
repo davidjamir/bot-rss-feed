@@ -45,9 +45,34 @@ function cleanSummary(summary = "") {
     .trim();
 }
 
+function smartCutTitle(
+  text,
+  { minLength = 30, maxLength = 100, ellipsis = true } = {},
+) {
+  if (!text) return "";
+
+  const s = text.replace(/\s+/g, " ").trim();
+  if (s.length <= maxLength) return s;
+
+  // 1️⃣ try sentence end within range
+  const sentenceMatch = s.slice(minLength, maxLength + 1).match(/[.!?]/);
+  if (sentenceMatch) {
+    const cutAt = minLength + sentenceMatch.index + 1;
+    return s.slice(0, cutAt).trim();
+  }
+
+  // 2️⃣ fallback: cut at nearest space before maxLength
+  let cutAt = s.lastIndexOf(" ", maxLength);
+  if (cutAt < minLength) {
+    cutAt = maxLength;
+  }
+
+  return s.slice(0, cutAt).trim() + (ellipsis ? "…" : "");
+}
+
 function buildPublishItem(item) {
   return {
-    title: item.title || "",
+    title: smartCutTitle(item.title || ""),
     link: item.link || "",
     guid: item.guid || item.id || item.link || "",
     publishedAt: item.isoDate || item.pubDate || "",
