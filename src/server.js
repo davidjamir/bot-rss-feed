@@ -47,30 +47,31 @@ function cleanSummary(summary = "") {
 
 function smartCutTitle(
   text,
-  { minLength = 30, maxLength = 100, ellipsis = true } = {},
+  {
+    cutWindowMin = 40,
+    cutWindowMax = 250,
+    triggerLength = 90,
+    ellipsis = true,
+  } = {},
 ) {
-  console.log("SMART CUT INPUT:", text.length);
   if (!text) return "";
 
   const s = text.replace(/\s+/g, " ").trim();
-  console.log("NORMALIZED LENGTH:", s.length);
-  if (s.length <= maxLength) {
-    console.log("RETURN EARLY");
+  if (s.length <= triggerLength) {
     return s;
   }
 
-  console.log("CUTTING...");
   // 1️⃣ try sentence end within range
-  const sentenceMatch = s.slice(minLength, maxLength + 1).match(/[.!?]/);
+  const sentenceMatch = s.slice(cutWindowMin, cutWindowMax + 1).match(/[.!?]/);
   if (sentenceMatch) {
-    const cutAt = minLength + sentenceMatch.index + 1;
+    const cutAt = cutWindowMin + sentenceMatch.index + 1;
     return s.slice(0, cutAt).trim();
   }
 
-  // 2️⃣ fallback: cut at nearest space before maxLength
-  let cutAt = s.lastIndexOf(" ", maxLength);
-  if (cutAt < minLength) {
-    cutAt = maxLength;
+  // 2️⃣ fallback: cut at nearest space before cutWindowMax
+  let cutAt = s.lastIndexOf(" ", cutWindowMax);
+  if (cutAt < cutWindowMin) {
+    cutAt = cutWindowMax;
   }
 
   return s.slice(0, cutAt).trim() + (ellipsis ? "…" : "");
