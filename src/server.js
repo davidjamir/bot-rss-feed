@@ -49,11 +49,17 @@ function smartCutTitle(
   text,
   { minLength = 30, maxLength = 100, ellipsis = true } = {},
 ) {
+  console.log("SMART CUT INPUT:", text.length);
   if (!text) return "";
 
   const s = text.replace(/\s+/g, " ").trim();
-  if (s.length <= maxLength) return s;
+  console.log("NORMALIZED LENGTH:", s.length);
+  if (s.length <= maxLength) {
+    console.log("RETURN EARLY");
+    return s;
+  }
 
+  console.log("CUTTING...");
   // 1️⃣ try sentence end within range
   const sentenceMatch = s.slice(minLength, maxLength + 1).match(/[.!?]/);
   if (sentenceMatch) {
