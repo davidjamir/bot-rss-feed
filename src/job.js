@@ -261,4 +261,5 @@ async function batchesCron(limit = 10) {
 module.exports = {
   collectBatchJob,
   batchesCron,
+  parseFeed,
 };

@@ -1,10 +1,4 @@
-const Parser = require("rss-parser");
-
-const parser = new Parser({
-  customFields: {
-    item: [["content:encoded", "contentEncoded"]],
-  },
-});
+const { parseFeed } = require("../src/job");
 
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store, max-age=0");
@@ -22,7 +16,7 @@ module.exports = async (req, res) => {
         .json({ ok: false, error: "Missing ?url=<feedUrl>" });
     }
 
-    const feed = await parser.parseURL(feedUrl);
+    const feed = await parseFeed(feedUrl);
 
     console.log("Parser RSS URL", feedUrl);
     return res.status(200).json({
