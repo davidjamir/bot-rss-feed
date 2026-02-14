@@ -72,7 +72,7 @@ function fmtTagList(title, arr) {
   if (!xs.length) return `${title}: <b>(not set)</b>`;
   return [
     `${title}`,
-    ...xs.map((x, index) => `#${index + 1} • <code>${x}</code>`),
+    ...xs.map((x, index) => `#${index + 1}) • <code>${x}</code>`),
   ].join("\n");
 }
 
