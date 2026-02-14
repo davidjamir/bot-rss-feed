@@ -70,7 +70,10 @@ function parseTagList(arg) {
 function fmtTagList(title, arr) {
   const xs = Array.isArray(arr) ? arr : [];
   if (!xs.length) return `${title}: <b>(not set)</b>`;
-  return [`${title}`, ...xs.map((x) => `• <code>${x}</code>`)].join("\n");
+  return [
+    `${title}`,
+    ...xs.map((x, index) => `#${index} • <code>${x}</code>`),
+  ].join("\n");
 }
 
 // xác định “targetChatId” cho command
