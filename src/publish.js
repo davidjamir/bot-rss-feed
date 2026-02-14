@@ -11,6 +11,7 @@ async function saveBatch(payload, mode) {
     telegram: {
       sent: false,
       failCount: 0,
+      sentLinks: [],
       lastError: null,
       sentAt: null,
     },
@@ -27,14 +28,14 @@ async function saveBatch(payload, mode) {
   });
 }
 
-async function getBatches(limit = 10) {
+async function getBatches(limit = 10, maxRetry = 5) {
   const db = await getDb();
   const col = db.collection("batches");
 
   const query = {
     $or: [
       // chưa gửi telegram
-      { "telegram.sent": false },
+      { "telegram.sent": false, "telegram.failCount": { $lt: maxRetry } },
 
       // collect: telegram ok, server chưa ok
       {
@@ -78,7 +79,7 @@ async function onTelegramSuccess(batch) {
   );
 }
 
-async function onTelegramFail(batch, err) {
+async function onTelegramFail(batch, err, successLinks = []) {
   const db = await getDb();
   const col = db.collection("batches");
 
@@ -88,7 +89,11 @@ async function onTelegramFail(batch, err) {
     { _id: batch._id },
     {
       $inc: { "telegram.failCount": 1 },
-      $set: { "telegram.lastError": errorMsg, updatedAt: new Date() },
+      $set: {
+        "telegram.lastError": errorMsg,
+        updatedAt: new Date(),
+        "telegram.sentLinks": successLinks,
+      },
     },
   );
 

@@ -213,7 +213,7 @@ async function collectBatchJob(jobKey = "") {
 }
 
 async function batchesCron(limit = 10) {
-  const batches = await getBatches(limit);
+  const batches = await getBatches(limit, MAX_RETRY);
 
   const stats = {
     processed: batches.length,
@@ -224,12 +224,30 @@ async function batchesCron(limit = 10) {
   for (const batch of batches) {
     // ===== TELEGRAM =====
     if (!batch.telegram?.sent && batch.telegram.failCount <= MAX_RETRY) {
+      const sentLinks = batch.telegram?.sentLinks || [];
+
+      const filteredItems = batch.payload.items.filter(
+        (item) => !sentLinks.includes(item.link),
+      );
+
+      if (!filteredItems.length) {
+        // Tất cả đã gửi xong
+        await onTelegramSuccess(batch);
+        stats.telegram.sent++;
+        continue;
+      }
+
+      const newPayload = {
+        ...batch.payload,
+        items: filteredItems,
+      };
+
       try {
-        await sendTelegram(batch.payload);
+        await sendTelegram(newPayload);
         await onTelegramSuccess(batch);
         stats.telegram.sent++;
       } catch (e) {
-        await onTelegramFail(batch, e);
+        await onTelegramFail(batch, e.error, [...sentLinks, ...e.successLinks]);
         stats.telegram.failed++;
         continue;
       }
@@ -243,7 +261,7 @@ async function batchesCron(limit = 10) {
       batch.server.failCount <= MAX_RETRY
     ) {
       try {
-        await sendServerWithRetry(batch.payload, 2);
+        await sendServerWithRetry(batch.payload, MAX_RETRY);
         await onServerSuccess(batch); // delete
         stats.server.sent++;
       } catch (e) {

@@ -45,6 +45,7 @@ async function sendTelegram(payload) {
   const chatId = payload.chatId;
   const items = payload.items || [];
   const source = payload.source || {};
+  const successLinks = [];
 
   if (!chatId || !items.length) return;
 
@@ -52,9 +53,35 @@ async function sendTelegram(payload) {
   for (const item of items) {
     const text = formatItem(item, source.feedTitle || "", source.feedUrl || "");
 
-    await sendMessage(chatId, text);
+    try {
+      await sendMessage(chatId, text);
+      successLinks.push(item.link);
+    } catch (err) {
+      console.error("Telegram send error:", err?.response?.data || err.message);
 
-    await sleep(100); // 200–500ms tuỳ mày
+      // Rate limit retry 1 lần
+      if (err?.response?.status === 429) {
+        const retryAfter = err.response.data?.parameters?.retry_after || 3;
+        await sleep(retryAfter * 1000);
+
+        try {
+          await sendMessage(chatId, text);
+          successLinks.push(item.link);
+          continue; // retry thành công thì tiếp
+        } catch (retryErr) {
+          throw {
+            error: retryErr,
+            successLinks,
+          };
+        }
+      }
+      throw {
+        error: err,
+        successLinks,
+      };
+    }
+
+    await sleep(100);
   }
 }
 
