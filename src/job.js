@@ -193,13 +193,19 @@ async function collectBatchJob(jobKey = "") {
     createdAt: new Date().toISOString(),
   };
 
-  await saveBatch(payload, mode);
+  try {
+    // 1️⃣ update boundary trước
+    if (newItems[0]?.link) {
+      last[feedUrl] = newItems[0].link;
+      cfg.last = last;
+      await saveChannelConfig(chatId, cfg);
+    }
 
-  // update lastLink NGAY – tránh duplicate
-  if (items[0]?.link) {
-    last[feedUrl] = items[0].link;
-    cfg.last = last;
-    await saveChannelConfig(chatId, cfg);
+    // 2️⃣ sau đó mới save batch
+    await saveBatch(payload, mode);
+  } catch (e) {
+    console.error("Collect batch failed:", e);
+    return { ok: false, error: e.message };
   }
 
   return {
