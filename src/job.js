@@ -23,6 +23,8 @@ const parser = new Parser({
 });
 
 const MAX_RETRY = 5;
+const RSS2JSON_1 = "https://api.rss2json.com/v1/api.json?rss_url=";
+const RSS2JSON_2 = "https://www.toptal.com/developers/feed2json/convert?url=";
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
   const controller = new AbortController();
@@ -67,6 +69,83 @@ async function parseFeed(url) {
 
   const xml = await res.text();
   return parser.parseString(xml);
+}
+
+function convertJsonFeedToRSSLike(data, feedUrl = "") {
+  return {
+    ok: true,
+    feedUrl,
+    feed: {
+      items: (data.items || []).map((item) => ({
+        title: item.title,
+        link: item.link,
+        guid: item.guid,
+        categories: item.categories || [],
+        pubDate: item.pubDate || item.date_published,
+        summary: item.summary,
+        contentSnippet: item.description,
+        contentEncoded: item.content_html || item.content,
+      })),
+    },
+  };
+}
+
+async function parseRSS2JSON(serviceUrl, feedUrl) {
+  const fullUrl = serviceUrl + encodeURIComponent(feedUrl);
+
+  const res = await fetchWithTimeout(fullUrl, {}, 15000);
+
+  if (!res.ok) {
+    throw new Error(`RSS2JSON_HTTP_${res.status}`);
+  }
+
+  const data = await res.json();
+
+  if (!data?.items) {
+    throw new Error("RSS2JSON_INVALID");
+  }
+
+  return convertJsonFeedToRSSLike(data, feedUrl);
+}
+
+async function parseFeedSmart(url, options) {
+  const strategies = [
+    async () => {
+      console.log("Try RAW RSS...");
+      return await parseFeed(url);
+    },
+    async () => {
+      console.log("Try RSS2JSON #1...");
+      return await parseRSS2JSON(RSS2JSON_1, url);
+    },
+    async () => {
+      console.log("Try RSS2JSON #2...");
+      return await parseRSS2JSON(RSS2JSON_2, url);
+    },
+  ];
+
+  // ===== Nếu có option -> chạy đúng 1 strategy =====
+  if (options !== undefined) {
+    if (!strategies[options]) {
+      throw new Error("INVALID_OPTION");
+    }
+
+    return await strategies[options]();
+  }
+
+  // ===== Nếu không có option -> auto fallback =====
+  let lastError;
+
+  for (let i = 0; i < strategies.length; i++) {
+    try {
+      return await strategies[i]();
+    } catch (err) {
+      console.log(`Strategy ${i} failed:`, err?.message || err);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("ALL_STRATEGIES_FAILED");
 }
 
 function toStr(x) {
@@ -146,7 +225,7 @@ async function collectBatchJob(jobKey = "") {
 
   let feed;
   try {
-    feed = await parseFeed(feedUrl);
+    feed = await parseFeedSmart(feedUrl);
   } catch (e) {
     return {
       ok: false,
@@ -284,5 +363,5 @@ async function batchesCron(limit = 10) {
 module.exports = {
   collectBatchJob,
   batchesCron,
-  parseFeed,
+  parseFeedSmart,
 };
