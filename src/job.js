@@ -71,22 +71,19 @@ async function parseFeed(url) {
   return parser.parseString(xml);
 }
 
-function convertJsonFeedToRSSLike(data, feedUrl = "") {
+function convertJsonFeedToRSSLike(data) {
   return {
-    ok: true,
-    feedUrl,
-    feed: {
-      items: (data.items || []).map((item) => ({
-        title: item.title,
-        link: item.link,
-        guid: item.guid,
-        categories: item.categories || [],
-        pubDate: item.pubDate || item.date_published,
-        summary: item.summary,
-        contentSnippet: item.description,
-        contentEncoded: item.content_html || item.content,
-      })),
-    },
+    title: data.title || data.feed.title,
+    items: (data.items || []).map((item) => ({
+      title: item.title,
+      link: item.link,
+      guid: item.guid,
+      categories: item.categories || [],
+      pubDate: item.pubDate || item.date_published,
+      summary: item.summary,
+      contentSnippet: item.description,
+      contentEncoded: item.content_html || item.content,
+    })),
   };
 }
 
@@ -105,7 +102,7 @@ async function parseRSS2JSON(serviceUrl, feedUrl) {
     throw new Error("RSS2JSON_INVALID");
   }
 
-  return convertJsonFeedToRSSLike(data, feedUrl);
+  return convertJsonFeedToRSSLike(data);
 }
 
 async function parseFeedSmart(url, options) {
