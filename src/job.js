@@ -166,7 +166,6 @@ async function collectBatchJob(jobKey = "") {
   for (const item of [...newItems].reverse()) {
     if (shouldCreatePost(item)) {
       publishItems.push(buildPublishItem(item));
-      console.log("Title: ", item.title);
     }
   }
 
