@@ -76,7 +76,7 @@ function convertJsonFeedToRSSLike(data) {
     title: data.title || data.feed.title,
     items: (data.items || []).map((item) => ({
       title: item.title,
-      link: item.link,
+      link: item.link || item.url,
       guid: item.guid,
       creator: item?.author?.name || item?.author,
       categories: item.categories || [],
