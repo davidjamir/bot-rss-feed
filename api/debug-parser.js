@@ -22,9 +22,9 @@ module.exports = async (req, res) => {
         ? await parseFeedSmart(feedUrl)
         : await parseFeedSmart(feedUrl, options);
 
-    console.log("Parser RSS URL", { options, ...feedUrl });
     return res.status(200).json({
       ok: true,
+      options,
       feedUrl,
       feed,
     });
