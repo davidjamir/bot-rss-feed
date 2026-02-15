@@ -78,6 +78,7 @@ function convertJsonFeedToRSSLike(data) {
       title: item.title,
       link: item.link,
       guid: item.guid,
+      creator: item.author || item.author.name,
       categories: item.categories || [],
       pubDate: item.pubDate || item.date_published,
       summary: item.summary,
