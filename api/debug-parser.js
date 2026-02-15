@@ -10,14 +10,17 @@ module.exports = async (req, res) => {
   try {
     const url = new URL(req.url, `https://${req.headers.host || "localhost"}`);
     const feedUrl = String(url.searchParams.get("url") || "").trim(); // ?url=
-    const options = url.searchParams.get("option");
+    const options = url.searchParams.get("options") || -1;
     if (!feedUrl) {
       return res
         .status(400)
         .json({ ok: false, error: "Missing ?url=<feedUrl>" });
     }
 
-    const feed = await parseFeedSmart(feedUrl, options);
+    const feed =
+      options === -1
+        ? await parseFeedSmart(feedUrl)
+        : await parseFeedSmart(feedUrl, options);
 
     console.log("Parser RSS URL", { options, ...feedUrl });
     return res.status(200).json({
