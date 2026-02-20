@@ -351,6 +351,7 @@ async function batchesCron(limit = 10) {
       } catch (e) {
         await onServerFail(batch, e);
         stats.server.failed++;
+        continue;
       }
     }
   }
