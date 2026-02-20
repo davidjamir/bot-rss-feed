@@ -89,7 +89,7 @@ function buildPublishItem(item) {
   };
 }
 
-async function sendServerWithRetry(payload, retries = 3) {
+async function sendServerWithRetry(payload, retries = 2) {
   let lastErr;
   for (let i = 0; i < retries; i++) {
     try {

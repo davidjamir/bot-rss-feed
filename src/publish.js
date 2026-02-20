@@ -42,6 +42,7 @@ async function getBatches(limit = 10, maxRetry = 5) {
         mode: "collect",
         "telegram.sent": true,
         "server.sent": false,
+        "server.failCount": { $lt: maxRetry },
       },
     ],
   };

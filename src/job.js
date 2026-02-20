@@ -345,7 +345,7 @@ async function batchesCron(limit = 10) {
     ) {
       try {
         console.log("Server items of ChatId: ", newPayload.chatId);
-        await sendServerWithRetry(batch.payload, MAX_RETRY);
+        await sendServerWithRetry(batch.payload);
         await onServerSuccess(batch); // delete
         stats.server.sent++;
       } catch (e) {
