@@ -123,7 +123,7 @@ async function onServerFail(batch, err) {
     },
   );
 
-  console.error("[telegram] send failed", batch._id.toString(), errorMsg);
+  console.error("[server] send failed", batch._id.toString(), errorMsg);
 }
 
 module.exports = {
