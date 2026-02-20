@@ -23,6 +23,7 @@ async function sendServer(payload) {
 
   if (!res.ok) {
     const t = await res.text().catch(() => "");
+    console.log("Response from server: ", t);
     throw new Error(`Publish webhook failed ${res.status}: ${t.slice(0, 300)}`);
   }
 }

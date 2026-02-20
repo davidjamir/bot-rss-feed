@@ -325,6 +325,7 @@ async function batchesCron(limit = 10) {
       };
 
       try {
+        console.log("Telegram items of ChatId: ", newPayload.chatId);
         await sendTelegram(newPayload);
         await onTelegramSuccess(batch);
         stats.telegram.sent++;
@@ -343,6 +344,7 @@ async function batchesCron(limit = 10) {
       batch.server.failCount <= MAX_RETRY
     ) {
       try {
+        console.log("Server items of ChatId: ", newPayload.chatId);
         await sendServerWithRetry(batch.payload, MAX_RETRY);
         await onServerSuccess(batch); // delete
         stats.server.sent++;
