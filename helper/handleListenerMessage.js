@@ -6,12 +6,11 @@ function toStr(x) {
   return String(x == null ? "" : x).trim();
 }
 
-function buildResponsetoTelegram({
+function buildResponseScheduletoTelegram({
   status,
   skipped,
   page,
   title,
-  link,
   text,
   timeBangkok,
   timeNewyork,
@@ -77,9 +76,9 @@ async function handleListenerMessage(chatId, text) {
   const r = await postUpdateLinkToServer(endpoint, token, payload);
 
   if (r.status >= 300) return;
-  const textResponse = buildResponsetoTelegram(r.json);
+  const textResponse = buildResponseScheduletoTelegram(r.json);
 
   return await sendMessage(r.json.chatId, textResponse);
 }
 
-module.exports = { handleListenerMessage };
+module.exports = { handleListenerMessage, buildResponseScheduletoTelegram };

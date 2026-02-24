@@ -1,7 +1,35 @@
 const { sendMessage } = require("../src/telegram");
-
+const {
+  buildResponseScheduletoTelegram,
+} = require("../helper/handleListenerMessage");
 function toStr(x) {
   return String(x == null ? "" : x).trim();
+}
+
+function buildResponsePublishToTelegram({
+  status,
+  page,
+  title,
+  text,
+  timeBangkok,
+  timeNewyork,
+} = {}) {
+  const _title = (title || "New post").trim();
+  const _page = (page || "").trim();
+
+  const header = status
+    ? "🚀🚀🚀 Success Published 🔥🔥🔥"
+    : "❌❌❌ Failed Published 🔥🔥🔥";
+
+  const parts = [];
+  parts.push(`<b>${header}</b>`);
+  parts.push(`<b>${_title}</b>`);
+  if (text) parts.push(text);
+  if (_page) parts.push(`Page: ${_page}`);
+  if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
+  if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
+
+  return parts.join("\n");
 }
 
 module.exports = async (req, res) => {
@@ -13,32 +41,19 @@ module.exports = async (req, res) => {
 
   try {
     const body = req.body || {};
-
     const chatId = toStr(body.chatId);
-    const page = toStr(body.page);
-    const title = toStr(body.title);
-    const status = Boolean(body.status);
-    const text = toStr(body.text);
-    const timeBangkok = toStr(body.timeBangkok);
-    const timeNewyork = toStr(body.timeNewyork);
 
-    if (!chatId || !title || !page) {
-      throw new Error("Missing chatId, page or title");
+    if (!chatId) {
+      throw new Error("Missing chatId");
     }
 
-    const header = status
-      ? "🚀🚀🚀 Success Published 🔥🔥🔥"
-      : "❌❌❌ Failed Published 🔥🔥🔥";
-
-    const parts = [];
-    parts.push(`<b>${header}</b>`);
-    parts.push(`<b>${title}</b>`);
-    if (text) parts.push(text);
-    if (page) parts.push(`Page: ${page}`);
-    if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
-    if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
-
-    const message = parts.join("\n");
+    let message;
+    if (body.type === "post-social") {
+      message = buildResponsePublishToTelegram(body);
+    }
+    if (body.type === "schedule-social") {
+      message = buildResponseScheduletoTelegram(body);
+    }
 
     // gửi telegram
     await sendMessage(chatId, message);
