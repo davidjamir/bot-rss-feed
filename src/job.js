@@ -203,11 +203,6 @@ async function collectBatchJob(jobKey = "") {
 
   const cfg = await getChannelConfig(chatId);
 
-  //Log Checking
-  if (chatId == "-1003640867556") {
-    console.log("Config: ", cfg);
-  }
-
   // check feed còn tồn tại
   const feedCfg = (cfg.feeds || []).find(
     (f) => normalizeUrl(f?.url) === feedUrl,
@@ -225,11 +220,6 @@ async function collectBatchJob(jobKey = "") {
   const flags = cfg.flags || [];
   const tags = cfg.tags || [];
   const targets = cfg.targets || [];
-
-  //Log Checking
-  if (chatId == "-1003640867556") {
-    console.log("Tags: ", tags);
-  }
 
   let feed;
   try {
@@ -278,11 +268,6 @@ async function collectBatchJob(jobKey = "") {
     items: publishItems,
     createdAt: new Date().toISOString(),
   };
-
-  //Log Checking
-  if (chatId == "-1003640867556") {
-    console.log("Payload: ", payload);
-  }
 
   try {
     // 1️⃣ update boundary trước
