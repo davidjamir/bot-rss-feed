@@ -3,12 +3,11 @@ function sleep(ms) {
 }
 
 async function sendServer(payload) {
-  const { endpoint, token, tokenMasked, updatedAt } = payload?.api || {};
+  const { endpoint, token, updatedAt } = payload?.api || {};
   if (!endpoint) return;
 
   payload.api = {
     endpoint,
-    token: tokenMasked,
     updatedAt,
   };
 
