@@ -14,6 +14,7 @@ const client = new MongoClient(process.env.MONGODB_URI, options);
 attachDatabasePool(client);
 
 let _db;
+let _initialized = false;
 
 async function getDb() {
   if (_db) return _db;
@@ -24,7 +25,21 @@ async function getDb() {
   }
 
   _db = client.db(process.env.MONGODB_DB || "databases_bot");
+
+  if (!_initialized) {
+    await ensureTTLIndex();
+    _initialized = true;
+  }
   return _db;
+}
+
+async function ensureTTLIndex() {
+  const db = await getDb();
+
+  await db.collection("batches").createIndex(
+    { createdAt: 1 },
+    { expireAfterSeconds: 60 * 60 * 24 * 10 }, // 1 ngày
+  );
 }
 
 // Export MongoClient cho các route hoặc file khác có thể sử dụng lại
