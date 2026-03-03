@@ -90,11 +90,13 @@ function buildPublishItem(item) {
 
 async function sendServerWithRetry(payload, retries = 2) {
   let lastErr;
+  console.log("ChatId: ", payload.chatId);
   for (let i = 0; i < retries; i++) {
     try {
       await sendServer(payload);
       return;
     } catch (e) {
+      console.log("API: ", payload.api);
       lastErr = e;
       await sleep(500 + i * i * 1000); // 500ms, 1500ms, 3500ms
     }
