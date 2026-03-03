@@ -38,7 +38,7 @@ async function ensureTTLIndex() {
 
   await db.collection("batches").createIndex(
     { createdAt: 1 },
-    { expireAfterSeconds: 60 * 60 * 24 * 10 }, // 1 ngày
+    { expireAfterSeconds: 60 * 60 * 12 }, // 12h
   );
 }
 
