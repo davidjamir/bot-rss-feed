@@ -97,7 +97,6 @@ async function sendServerWithRetry(payload, retries = 2) {
       await sendServer(payload);
       return;
     } catch (e) {
-      console.log("API: ", payload.api);
       lastErr = e;
       await sleep(500 + i * i * 1000); // 500ms, 1500ms, 3500ms
     }
