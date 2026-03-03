@@ -6,12 +6,11 @@ async function sendServer(payload) {
   const { endpoint, token, updatedAt } = payload?.api || {};
   if (!endpoint) return;
 
-  const newPayload = {
-    ...payload,
-    api: {
-      endpoint,
-      updatedAt,
-    },
+  console.log("Token", token);
+
+  payload.api = {
+    endpoint,
+    updatedAt,
   };
 
   const res = await fetch(endpoint, {
@@ -94,6 +93,8 @@ function buildPublishItem(item) {
 async function sendServerWithRetry(payload, retries = 2) {
   let lastErr;
   console.log("ChatId: ", payload.chatId);
+  console.log("API: ", payload.api);
+  console.log("Source: ", payload.source);
   for (let i = 0; i < retries; i++) {
     try {
       await sendServer(payload);
