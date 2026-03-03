@@ -6,9 +6,12 @@ async function sendServer(payload) {
   const { endpoint, token, updatedAt } = payload?.api || {};
   if (!endpoint) return;
 
-  payload.api = {
-    endpoint,
-    updatedAt,
+  const newPayload = {
+    ...payload,
+    api: {
+      endpoint,
+      updatedAt,
+    },
   };
 
   const res = await fetch(endpoint, {
@@ -17,7 +20,7 @@ async function sendServer(payload) {
       "content-type": "application/json",
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(newPayload),
   });
 
   if (!res.ok) {
