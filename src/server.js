@@ -25,7 +25,6 @@ async function sendServer(payload) {
 
   if (!res.ok) {
     const t = await res.text().catch(() => "");
-    console.log("Response from server: ", t);
     throw new Error(`Publish webhook failed ${res.status}: ${t.slice(0, 300)}`);
   }
 }
@@ -93,9 +92,6 @@ function buildPublishItem(item) {
 
 async function sendServerWithRetry(payload, retries = 2) {
   let lastErr;
-  console.log("ChatId: ", payload.chatId);
-  console.log("API: ", payload.api);
-  console.log("Source: ", payload.source);
   for (let i = 0; i < retries; i++) {
     try {
       await sendServer(payload);
