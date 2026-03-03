@@ -6,11 +6,12 @@ async function sendServer(payload) {
   const { endpoint, token, updatedAt } = payload?.api || {};
   if (!endpoint) return;
 
-  console.log("Token", token);
-
-  payload.api = {
-    endpoint,
-    updatedAt,
+  const safePayload = {
+    ...payload,
+    api: {
+      endpoint,
+      updatedAt,
+    },
   };
 
   const res = await fetch(endpoint, {
@@ -19,7 +20,7 @@ async function sendServer(payload) {
       "content-type": "application/json",
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(newPayload),
+    body: JSON.stringify(safePayload),
   });
 
   if (!res.ok) {
