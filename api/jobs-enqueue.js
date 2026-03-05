@@ -17,8 +17,6 @@ module.exports = async (req, res) => {
       return res.status(401).json({ ok: false, error: "Unauthorized" });
     }
 
-    console.log("Cloudflare Cron Job For Jobs Enqueue");
-
     const chatIds = await listChannelIds();
     const jobKeys = [];
 
@@ -35,6 +33,10 @@ module.exports = async (req, res) => {
         totalFeeds++;
       }
     }
+
+    console.log(
+      `[jobs-enqueue] Cloudflare Cron Job totalChats=${chatIds.length} totalFeeds=${totalFeeds}`,
+    );
 
     const r = await enqueueJobs(jobKeys);
 
