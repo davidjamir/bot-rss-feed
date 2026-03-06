@@ -35,7 +35,7 @@ async function getBatches(limit = 10, maxRetry = 5) {
   const query = {
     $or: [
       // chưa gửi telegram
-      { "telegram.sent": false, "telegram.failCount": { $lte: maxRetry } },
+      { "telegram.sent": false, "telegram.failCount": { $lt: maxRetry } },
 
       // collect: telegram ok, server chưa ok
       {

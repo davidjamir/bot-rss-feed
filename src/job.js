@@ -295,7 +295,7 @@ async function collectBatchJob(jobKey = "") {
 }
 
 async function batchesCron(limit = 10) {
-  const batches = await getBatches(limit, MAX_RETRY+1);
+  const batches = await getBatches(limit, MAX_RETRY);
 
   const stats = {
     processed: batches.length,
