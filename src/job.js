@@ -22,7 +22,7 @@ const parser = new Parser({
   },
 });
 
-const MAX_RETRY = 5;
+const MAX_RETRY = 3;
 const RSS2JSON_1 = "https://api.rss2json.com/v1/api.json?rss_url=";
 const RSS2JSON_2 = "https://www.toptal.com/developers/feed2json/convert?url=";
 
@@ -295,7 +295,7 @@ async function collectBatchJob(jobKey = "") {
 }
 
 async function batchesCron(limit = 10) {
-  const batches = await getBatches(limit, MAX_RETRY);
+  const batches = await getBatches(limit, MAX_RETRY+1);
 
   const stats = {
     processed: batches.length,
