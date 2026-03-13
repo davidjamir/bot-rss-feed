@@ -6,6 +6,8 @@ function toStr(x) {
   return String(x == null ? "" : x).trim();
 }
 
+const CHAT_SOCIAL_NOTIFY = process.env.CHAT_SOCIAL_NOTIFY || "";
+
 function buildResponsePublishToTelegram({
   status,
   page,
@@ -57,6 +59,10 @@ module.exports = async (req, res) => {
 
     // gửi telegram
     await sendMessage(chatId, message);
+
+    if (!body.status && CHAT_SOCIAL_NOTIFY) {
+      await sendMessage(CHAT_SOCIAL_NOTIFY, message);
+    }
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error("webhook error:", e?.message || e);
