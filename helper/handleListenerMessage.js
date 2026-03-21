@@ -26,11 +26,11 @@ function buildResponseScheduletoTelegram({
 
   lines.push(`<b>${header}</b>`);
   lines.push(`<b>${_title}</b>`);
+  if (_page) lines.push(`Page: ${_page}`);
   if (text) {
     lines.push(`<b>Note: </b>${text}`);
     return lines.join("\n");
   }
-  if (_page) lines.push(`Page: ${_page}`);
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
   if (skipped) lines.push(`<b>Skipped</b>`);
