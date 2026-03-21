@@ -13,11 +13,13 @@ function buildResponsePublishToTelegram({
   page,
   title,
   text,
+  topic,
   timeBangkok,
   timeNewyork,
 } = {}) {
   const _title = (title || "New post").trim();
   const _page = (page || "").trim();
+  const _topic = (topic || "").trim();
 
   const header = status
     ? "🚀🚀🚀 Success Published 🔥🔥🔥"
@@ -26,10 +28,11 @@ function buildResponsePublishToTelegram({
   const parts = [];
   parts.push(`<b>${header}</b>`);
   parts.push(`<b>${_title}</b>`);
-  if (text) parts.push(text);
+  if (_topic) lines.push(`Topic: ${_topic}`);
   if (_page) parts.push(`Page: ${_page}`);
   if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
+  if (text) parts.push(text);
 
   return parts.join("\n");
 }

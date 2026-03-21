@@ -12,11 +12,13 @@ function buildResponseScheduletoTelegram({
   page,
   title,
   text,
+  topic,
   timeBangkok,
   timeNewyork,
 } = {}) {
   const _title = (title || "New post").trim();
   const _page = (page || "").trim();
+  const _topic = (topic || "").trim();
 
   const header = status
     ? "🔥🔥🔥 Schedule Notify 🔥🔥🔥"
@@ -26,13 +28,14 @@ function buildResponseScheduletoTelegram({
 
   lines.push(`<b>${header}</b>`);
   lines.push(`<b>${_title}</b>`);
+  if (_topic) lines.push(`Topic: ${_topic}`);
   if (_page) lines.push(`Page: ${_page}`);
+  if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
+  if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
   if (text) {
     lines.push(`<b>Note: </b>${text}`);
     return lines.join("\n");
   }
-  if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
-  if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);
   if (skipped) lines.push(`<b>Skipped</b>`);
 
   return lines.join("\n");
