@@ -28,7 +28,7 @@ function buildResponseScheduletoTelegram({
 
   lines.push(`<b>${header}</b>`);
   lines.push(`<b>${_title}</b>`);
-  if (_topic) lines.push(`Topic: ${_topic}`);
+  if (_topic && !status) lines.push(`Topic: ${_topic}`);
   if (_page) lines.push(`Page: ${_page}`);
   if (timeBangkok) lines.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) lines.push(`<i>🕒 ${timeNewyork}</i>`);

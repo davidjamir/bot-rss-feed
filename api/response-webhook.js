@@ -28,7 +28,7 @@ function buildResponsePublishToTelegram({
   const parts = [];
   parts.push(`<b>${header}</b>`);
   parts.push(`<b>${_title}</b>`);
-  if (_topic) lines.push(`Topic: ${_topic}`);
+  if (_topic && !status) parts.push(`Topic: ${_topic}`);
   if (_page) parts.push(`Page: ${_page}`);
   if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
