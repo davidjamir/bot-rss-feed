@@ -254,9 +254,10 @@ async function removeTopic(chatId, topic) {
 }
 
 // ===== FLAGS =====
-async function setFlags(chatId, flags) {
+async function addFlag(chatId, flags) {
   const cfg = await getChannelConfig(chatId);
-  cfg.flags = normalizeList(flags);
+  const keys = normalizeList(flags);
+  cfg.flags = normalizeList([...(cfg.flags || []), ...keys]);
   await saveChannelConfig(chatId, cfg);
   return cfg;
 }
@@ -350,7 +351,7 @@ module.exports = {
   setTopics,
   getTopics,
   removeTopic,
-  setFlags,
+  addFlag,
   getFlags,
   removeFlag,
   addTarget,

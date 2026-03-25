@@ -15,7 +15,7 @@ const {
   setTopics,
   getTopics,
   removeTopic,
-  setFlags,
+  addFlag,
   getFlags,
   removeFlag,
   addTarget,
@@ -144,7 +144,7 @@ async function handleCommand(message) {
         "",
         "<b>Flags</b>",
         "Set flags for this chat/channel to control workflow.",
-        "• <b>/setflag</b> flag1 flag2   — set flags (space or comma separated)",
+        "• <b>/addflag</b> flag1 flag2   — add flags (space or comma separated)",
         "• <b>/listflags</b>   — show current flags",
         "• <b>/removeflag</b> flag   — remove one flag",
         "",
@@ -168,7 +168,7 @@ async function handleCommand(message) {
         "<b>/addfeed collect https://example.com/rss</b>",
         "<b>/setapi https://publish.example.com [option - token]</b>",
         "<b>/settopic technology ai</b> or <b>/settopic technology,ai</b>",
-        "<b>/setflag starred manual</b>",
+        "<b>/addflag started manual</b>",
       ].join("\n"),
     );
   }
@@ -494,16 +494,16 @@ async function handleCommand(message) {
     );
   }
 
-  // SETFLAG: /setflag starred manual
-  if (cmd === "/setflag") {
+  // SETFLAG: /addflag starred manual
+  if (cmd === "/addflag") {
     if (!arg) {
       return sendMessage(
         chatIdToReply,
-        "Use <code>/setflag starred manual</code> or <code>/setflag starred,manual</code>",
+        "Use <code>/addflag starred manual</code> or <code>/addflag starred,manual</code>",
       );
     }
     const flags = parseTagList(arg);
-    await setFlags(targetChatId, flags);
+    await addFlag(targetChatId, flags);
     const current = await getFlags(targetChatId);
     return sendMessage(
       chatIdToReply,
