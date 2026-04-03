@@ -76,18 +76,28 @@ function cutPointerPrefixAnywhere(snippet) {
 
   // remove any fragment like "*]:pointer...>"
   s = s
-    // pointer / tailwind
-    .replace(/\*?\]?:pointer[^\s>]*/gi, " ")
-    .replace(/pointer-[^\s"]+/gi, " ")
-    .replace(/scroll-mt-\[[^\]]+\]/gi, " ")
+    // pointer fragment
+    .replace(/\*?\]?:pointer[^\s">,.;)]+/gi, " ")
+
+    // tailwind arbitrary
+    .replace(/\b[a-z-]+-(\[[^\]]+\]|\([^)]+\))/gi, " ")
 
     // attribute chuẩn
     .replace(/\b[a-z-]+="[^"]*"/gi, " ")
 
     // attribute bị gãy
-    .replace(/\b[a-z-]+="[^"]*/gi, " ");
+    .replace(/\b[a-z-]+="[^"\s>]*/gi, " ")
 
-  return s.replace(/\s+/g, " ").trim();
+    // leftover symbols
+    .replace(/\s?>\s?/g, " ")
+    .replace(/"+/g, " ")
+
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (s.length < 20) return ""; // optional nhưng nên có
+
+  return s;
 }
 
 const TG_LIMITS = {
