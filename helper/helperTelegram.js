@@ -10,7 +10,7 @@ function esc(s = "") {
 }
 
 function stripHtml(s = "") {
-  return s.replace(/<[^>]*>/g, " ");
+  return s.replace(/<[^>]*>?/g, " ");
 }
 
 // escape cho attribute trong HTML (href)
@@ -75,7 +75,17 @@ function cutPointerPrefixAnywhere(snippet) {
     .trim();
 
   // remove any fragment like "*]:pointer...>"
-  s = s.replace(/\*?\]?:pointer[^>]*>/gi, " ");
+  s = s
+    // pointer / tailwind
+    .replace(/\*?\]?:pointer[^\s>]*/gi, " ")
+    .replace(/pointer-[^\s"]+/gi, " ")
+    .replace(/scroll-mt-\[[^\]]+\]/gi, " ")
+
+    // attribute chuẩn
+    .replace(/\b[a-z-]+="[^"]*"/gi, " ")
+
+    // attribute bị gãy
+    .replace(/\b[a-z-]+="[^"]*/gi, " ");
 
   return s.replace(/\s+/g, " ").trim();
 }
@@ -109,7 +119,7 @@ function removeLinks(text) {
   return (
     String(text)
       // remove http / https links
-      .replace(/https?:\/\/[^\s)>\]"'}]+/gi, "")
+      .replace(/https?:\/\/[^\s<]+[^<.,:;"')\]\s]/gi, "")
       // cleanup extra spaces
       .replace(/\s{2,}/g, " ")
       .trim()
@@ -123,14 +133,16 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
   const link = (item.link || "").trim();
   const safeLink = link ? cutWithDots(link, TG_LIMITS.link) : "";
 
-  const hasFull = item.html.trim().length > 500;
+  const hasFull = (item.html || "").trim().length > 500;
 
   const badge = hasFull ? "🔥🔥🔥🔥🔥 FULL 🔥🔥🔥🔥🔥" : "";
 
   const rawDesc = removeLinks(item.snippet || "");
   const cleanedDesc = breakAutoLinks(
-    stripHtml(cutPointerPrefixAnywhere(rawDesc)),
-  ).trim();
+    cutPointerPrefixAnywhere(stripHtml(rawDesc)),
+  )
+    .replace(/\s+/g, " ")
+    .trim();
   const desc = esc(cutWithDots(cleanedDesc, TG_LIMITS.desc));
 
   const domain = link ? new URL(link).hostname.replace(/^www\./, "") : "";
