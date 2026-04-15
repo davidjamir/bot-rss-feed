@@ -14,6 +14,18 @@ async function readJson(req) {
   return raw ? JSON.parse(raw) : {};
 }
 
+async function getFile(fileId) {
+  const res = await fetch(
+    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getFile?file_id=${fileId}`,
+  );
+  const json = await res.json();
+  return json.result;
+}
+
+function buildFileUrl(path) {
+  return `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${path}`;
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store, max-age=0");
 
@@ -43,20 +55,39 @@ module.exports = async (req, res) => {
     }
 
     // 2) Nhận message command để cấu hình
-    console.log("Message Update: ",update);
     if (update.message?.text) {
       await handleCommand(update.message);
     }
 
     // (tuỳ bạn) nhận command trong channel_post nếu admin post trong channel
-    if (update.channel_post?.text) {
+    if (update.channel_post) {
       // channel_post có format giống message nhưng field name khác
+      const msg = update.channel_post;
+
+      const text = msg.caption || msg.text || "";
+
+      let image_url = null;
+
+      // có ảnh thì mới xử lý
+      if (msg.photo && msg.photo.length > 0) {
+        try {
+          const fileId = msg.photo[msg.photo.length - 1].file_id;
+
+          const file = await getFile(fileId);
+
+          image_url = buildFileUrl(file.file_path);
+        } catch (err) {
+          console.error("getFile error:", err);
+        }
+      }
+
       await handleCommand({
-        ...update.channel_post,
-        chat: update.channel_post.chat,
-        from: update.channel_post.sender_chat ||
-          update.channel_post.from || { id: 0 },
-        text: update.channel_post.text,
+        chat: msg.chat,
+        from: msg.sender_chat || msg.from || { id: 0 },
+        message_id: msg.message_id,
+        media_group_id: msg.media_group_id || null,
+        text,
+        image_url,
       });
     }
 

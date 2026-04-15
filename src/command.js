@@ -93,8 +93,10 @@ async function handleCommand(message) {
   const text = (message.text || "").trim();
   const chatIdToReply = String(message.chat.id);
   const userId = message.from?.id;
+  const imageUrl = message.image_url;
 
-  if (!text.startsWith("/")) return handleListenerMessage(chatIdToReply, text);
+  if (!text.startsWith("/"))
+    return handleListenerMessage(({ chatIdToReply, text, imageUrl } = {}));
 
   const [cmdRaw, ...rest] = text.split(/\s+/);
   const cmd = cmdRaw.split("@")[0]; // /addfeed@botname => /addfeed

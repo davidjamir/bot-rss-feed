@@ -55,8 +55,8 @@ async function postUpdateLinkToServer(endpoint, token, payload) {
   return { ok: r.ok, status: r.status, json: safeParse(text), text };
 }
 
-async function handleListenerMessage(chatId, text) {
-  const cid = toStr(chatId);
+async function handleListenerMessage({ chatIdToReply, text, imageUrl }) {
+  const cid = toStr(chatIdToReply);
   const t = toStr(text);
   if (!cid) throw new Error("handleListenerMessage: chatId is required");
   if (!t) return null;
@@ -74,6 +74,7 @@ async function handleListenerMessage(chatId, text) {
     flags,
     tags,
     text: t,
+    imageUrl,
   };
 
   const r = await postUpdateLinkToServer(endpoint, token, payload);
