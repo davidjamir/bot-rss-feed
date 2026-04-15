@@ -31,7 +31,7 @@ const {
   getUserMember,
   isAdminLike,
 } = require("./telegram");
-const { handleListenerMessage } = require("../helper/handleListenerMessage");
+const { handleWithDelay } = require("../helper/handleListenerMessage");
 
 function normalizeUrl(u) {
   let s = String(u || "").trim();
@@ -93,10 +93,18 @@ async function handleCommand(message) {
   const text = (message.text || "").trim();
   const chatIdToReply = String(message.chat.id);
   const userId = message.from?.id;
-  const imageUrl = message.image_url;
+  const imageUrl = (message.image_url || "").trim();
+  const videoUrl = (message.video_url || "").trim();
+  const groupId = (message.media_group_id || "").trim();
 
   if (!text.startsWith("/"))
-    return handleListenerMessage({ chatIdToReply, text, imageUrl });
+    return handleWithDelay({
+      chatIdToReply,
+      text,
+      imageUrl,
+      videoUrl,
+      groupId,
+    });
 
   const [cmdRaw, ...rest] = text.split(/\s+/);
   const cmd = cmdRaw.split("@")[0]; // /addfeed@botname => /addfeed

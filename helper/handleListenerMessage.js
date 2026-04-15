@@ -55,7 +55,20 @@ async function postUpdateLinkToServer(endpoint, token, payload) {
   return { ok: r.ok, status: r.status, json: safeParse(text), text };
 }
 
-async function handleListenerMessage({ chatIdToReply, text, imageUrl } = {}) {
+function detectContentType({ images = [], videos = [], text }) {
+  if (images.length && videos.length) return "mixed";
+  if (videos.length) return "video";
+  if (images.length) return "image";
+  if (text) return "text";
+  return "unknown";
+}
+
+async function handleListenerMessage({
+  chatIdToReply,
+  text,
+  images = [],
+  videos = [],
+} = {}) {
   const cid = toStr(chatIdToReply);
   const t = toStr(text);
   if (!cid) throw new Error("handleListenerMessage: chatId is required");
@@ -74,7 +87,9 @@ async function handleListenerMessage({ chatIdToReply, text, imageUrl } = {}) {
     flags,
     tags,
     text: t,
-    imageUrl,
+    images,
+    videos,
+    contentType: detectContentType({ images, videos, text: t }),
   };
 
   console.log("Payload: ", payload);
@@ -86,4 +101,67 @@ async function handleListenerMessage({ chatIdToReply, text, imageUrl } = {}) {
   return await sendMessage(r.json.chatId, textResponse);
 }
 
-module.exports = { handleListenerMessage, buildResponseScheduletoTelegram };
+const groups = {};
+
+async function handleWithDelay({
+  chatIdToReply,
+  text,
+  imageUrl,
+  videoUrl,
+  groupId,
+}) {
+  // ❗ không phải album → gửi luôn
+  if (!groupId) {
+    return handleListenerMessage({
+      chatIdToReply,
+      text,
+      images: imageUrl ? [imageUrl] : [],
+      videos: videoUrl ? [videoUrl] : [],
+    });
+  }
+
+  // 🧩 album
+  if (!groups[groupId]) {
+    groups[groupId] = {
+      chatIdToReply,
+      text: "",
+      images: [],
+      videos: [],
+      timeout: null,
+      createdAt: Date.now(),
+    };
+  }
+
+  const g = groups[groupId];
+
+  if (imageUrl) g.images.push(imageUrl);
+  if (videoUrl) g.videos.push(videoUrl);
+  if (text) g.text = text;
+
+  if (g.timeout) clearTimeout(g.timeout);
+
+  g.timeout = setTimeout(async () => {
+    try {
+      const finalPayload = {
+        chatIdToReply: g.chatIdToReply,
+        text: g.text,
+        images: [...new Set(g.images)], // 👈 dedupe luôn
+        videos: [...new Set(g.videos)],
+      };
+
+      console.log("FINAL GROUP:", finalPayload);
+
+      await handleListenerMessage(finalPayload);
+    } catch (e) {
+      console.error("group send error:", e);
+    } finally {
+      delete groups[groupId];
+    }
+  }, 1500); // ⏱ delay 1.2s (tuỳ chỉnh)
+}
+
+module.exports = {
+  handleListenerMessage,
+  handleWithDelay,
+  buildResponseScheduletoTelegram,
+};

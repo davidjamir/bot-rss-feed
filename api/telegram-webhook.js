@@ -67,18 +67,27 @@ module.exports = async (req, res) => {
       const text = msg.caption || msg.text || "";
 
       let image_url = null;
+      let video_url = null;
 
       // có ảnh thì mới xử lý
-      if (msg.photo && msg.photo.length > 0) {
-        try {
+      try {
+        // 🖼 ẢNH
+        if (msg.photo?.length) {
           const fileId = msg.photo[msg.photo.length - 1].file_id;
 
           const file = await getFile(fileId);
-
           image_url = buildFileUrl(file.file_path);
-        } catch (err) {
-          console.error("getFile error:", err);
         }
+
+        // 🎥 VIDEO
+        else if (msg.video) {
+          const fileId = msg.video.file_id;
+
+          const file = await getFile(fileId);
+          video_url = buildFileUrl(file.file_path);
+        }
+      } catch (err) {
+        console.error("getFile error:", err);
       }
 
       await handleCommand({
@@ -88,6 +97,7 @@ module.exports = async (req, res) => {
         media_group_id: msg.media_group_id || null,
         text,
         image_url,
+        video_url,
       });
     }
 
