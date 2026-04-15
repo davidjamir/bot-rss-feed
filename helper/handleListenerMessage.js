@@ -157,7 +157,7 @@ async function handleWithDelay({
     } finally {
       delete groups[groupId];
     }
-  }, 1500); // ⏱ delay 1.2s (tuỳ chỉnh)
+  }, 1500); // ⏱ delay 1.5s (tuỳ chỉnh)
 }
 
 module.exports = {
