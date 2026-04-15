@@ -90,7 +90,6 @@ async function resolveTargetChatId(message) {
 }
 
 async function handleCommand(message) {
-  console.log("Message: ", message);
   const text = (message.text || "").trim();
   const chatIdToReply = String(message.chat.id);
   const userId = message.from?.id;

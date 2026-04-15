@@ -43,6 +43,7 @@ module.exports = async (req, res) => {
     }
 
     // 2) Nhận message command để cấu hình
+    console.log("Message Update: ",update);
     if (update.message?.text) {
       await handleCommand(update.message);
     }
