@@ -149,8 +149,6 @@ async function handleWithDelay({
         videos: [...new Set(g.videos)],
       };
 
-      console.log("FINAL GROUP:", finalPayload);
-
       await handleListenerMessage(finalPayload);
     } catch (e) {
       console.error("group send error:", e);

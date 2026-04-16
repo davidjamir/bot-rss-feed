@@ -59,7 +59,6 @@ module.exports = async (req, res) => {
       await handleCommand(update.message);
     }
 
-    console.log("Update: ", update)
     // (tuỳ bạn) nhận command trong channel_post nếu admin post trong channel
     if (update.channel_post) {
       // channel_post có format giống message nhưng field name khác
