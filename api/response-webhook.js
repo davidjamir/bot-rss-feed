@@ -52,11 +52,12 @@ module.exports = async (req, res) => {
       throw new Error("Missing chatId");
     }
 
-    let message;
-    if (body.type === "post-social") {
+    let message = "Not valid of message type!";
+    console.log("Body: ", body);
+    if (body?.type === "post-social") {
       message = buildResponsePublishToTelegram(body);
     }
-    if (body.type === "schedule-social") {
+    if (body?.type === "schedule-social") {
       message = buildResponseScheduletoTelegram(body);
     }
 
