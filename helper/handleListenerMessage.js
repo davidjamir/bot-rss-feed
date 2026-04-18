@@ -76,8 +76,9 @@ async function handleListenerMessage({
 
   const cfg = (await getChannelConfig(cid)) || {};
   const listen = cfg?.listen;
-  const flags = cfg?.flags;
-  const tags = cfg?.tags;
+  const flags = cfg?.flags || [];
+  const tags = cfg?.tags || [];
+  const topics = cfg?.topics || [];
   const endpoint = toStr(listen?.endpoint);
   const token = toStr(listen?.token);
   if (!endpoint) return null;
@@ -86,6 +87,7 @@ async function handleListenerMessage({
     chatId: cid,
     flags,
     tags,
+    topics,
     text: t,
     images,
     videos,
