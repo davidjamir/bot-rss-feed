@@ -53,7 +53,6 @@ module.exports = async (req, res) => {
     }
 
     let message = "Not valid of message type!";
-    console.log("Body: ", body);
     if (body?.type === "post-social") {
       message = buildResponsePublishToTelegram(body);
     }
