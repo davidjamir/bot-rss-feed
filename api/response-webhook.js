@@ -7,6 +7,7 @@ function toStr(x) {
 }
 
 const CHAT_SOCIAL_NOTIFY = process.env.CHAT_SOCIAL_NOTIFY || "";
+const CHAT_SITES_NOTIFY = process.env.CHAT_SITES_NOTIFY || "";
 
 function buildResponsePublishToTelegram({
   status,
@@ -37,6 +38,36 @@ function buildResponsePublishToTelegram({
   return parts.join("\n");
 }
 
+function buildResponseSitesToTelegram({
+  status,
+  site,
+  targets,
+  title,
+  text,
+  topic,
+  timeBangkok,
+  timeNewyork,
+} = {}) {
+  const _title = (title || "New post").trim();
+  const _site = (site || targets.join("")).trim();
+  const _topic = (topic || "").trim();
+
+  const header = status
+    ? "🚀🚀🚀 Success Published Site 🔥🔥🔥"
+    : "❌❌❌ Failed Published Site 🔥🔥🔥";
+
+  const parts = [];
+  parts.push(`<b>${header}</b>`);
+  parts.push(`<b>${_title}</b>`);
+  if (_topic && !status) parts.push(`Topic: ${_topic}`);
+  if (_site) parts.push(`Site: ${_site}`);
+  if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
+  if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
+  if (text) parts.push(text);
+
+  return parts.join("\n");
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store, max-age=0");
 
@@ -59,13 +90,20 @@ module.exports = async (req, res) => {
     if (body?.type === "schedule-social") {
       message = buildResponseScheduletoTelegram(body);
     }
-
-    // gửi telegram
-    await sendMessage(chatId, message);
-
-    if (!body.status && CHAT_SOCIAL_NOTIFY) {
-      await sendMessage(CHAT_SOCIAL_NOTIFY, message);
+    if (body?.type === "post-sites") {
+      message = buildResponseSitesToTelegram(body);
+      await sendMessage(CHAT_SITES_NOTIFY, message);
     }
+
+    if (chatId && body?.type.include("social")) {
+      // gửi telegram
+      await sendMessage(chatId, message);
+
+      if (!body.status && CHAT_SOCIAL_NOTIFY) {
+        await sendMessage(CHAT_SOCIAL_NOTIFY, message);
+      }
+    }
+
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error("webhook error:", e?.message || e);
