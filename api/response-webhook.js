@@ -79,10 +79,6 @@ module.exports = async (req, res) => {
     const body = req.body || {};
     const chatId = toStr(body.chatId);
 
-    if (!chatId) {
-      throw new Error("Missing chatId");
-    }
-
     let message = "Not valid of message type!";
     if (body?.type === "post-social") {
       message = buildResponsePublishToTelegram(body);
@@ -95,9 +91,11 @@ module.exports = async (req, res) => {
       await sendMessage(CHAT_SITES_NOTIFY, message);
     }
 
-    if (chatId && body?.type.include("social")) {
+    if (body?.type.includes("social")) {
       // gửi telegram
-      await sendMessage(chatId, message);
+      if (chatId) {
+        await sendMessage(chatId, message);
+      }
 
       if (!body.status && CHAT_SOCIAL_NOTIFY) {
         await sendMessage(CHAT_SOCIAL_NOTIFY, message);
