@@ -52,15 +52,16 @@ function buildResponseSitesToTelegram({
   const _site = (site || targets.join("")).trim();
   const _topic = (topic || "").trim();
 
-  const header = status
-    ? "🚀🚀🚀 Success Published Site 🔥🔥🔥"
-    : "❌❌❌ Failed Published Site 🔥🔥🔥";
+  const header =
+    status === "success"
+      ? "🚀🚀🚀 Success Published Site 🔥🔥🔥"
+      : "❌❌❌ Failed Published Site 🔥🔥🔥";
 
   const parts = [];
   parts.push(`<b>${header}</b>`);
   parts.push(`<b>${_title}</b>`);
-  if (_topic && !status) parts.push(`Topic: ${_topic}`);
-  if (_site) parts.push(`Site: ${_site}`);
+  if (_topic) parts.push(`Topic: ${_topic}`);
+  if (_site) parts.push(`Website: ${_site}`);
   if (timeBangkok) parts.push(`<i>🕒 ${timeBangkok}</i>`);
   if (timeNewyork) parts.push(`<i>🕒 ${timeNewyork}</i>`);
   if (text) parts.push(text);
