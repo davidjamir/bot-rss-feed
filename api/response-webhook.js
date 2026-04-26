@@ -49,7 +49,7 @@ function buildResponseSitesToTelegram({
   timeNewyork,
 } = {}) {
   const _title = (title || "New post").trim();
-  const _site = (site || targets.join("")).trim();
+  const _site = (site || targets.join(" | ")).trim();
   const _topic = (topic || "").trim();
 
   const header =
