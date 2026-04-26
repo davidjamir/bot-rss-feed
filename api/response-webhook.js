@@ -41,7 +41,7 @@ function buildResponsePublishToTelegram({
 function buildResponseSitesToTelegram({
   status,
   site,
-  targets,
+  targets = [],
   title,
   text,
   topic,
