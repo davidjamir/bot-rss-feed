@@ -88,11 +88,8 @@ module.exports = async (req, res) => {
       message = buildResponseScheduletoTelegram(body);
     }
     if (body?.type === "post-sites") {
-      console.log("Body: ", body);
       message = buildResponseSitesToTelegram(body);
-      console.log("Message: ", message);
       const response = await sendMessage(CHAT_SITES_NOTIFY, message);
-      console.log("Response: ", response);
     }
 
     if (body?.type.includes("social")) {
