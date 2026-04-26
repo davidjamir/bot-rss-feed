@@ -19,7 +19,7 @@ function buildResponsePublishToTelegram({
   timeNewyork,
 } = {}) {
   const _title = (title || "New post").trim();
-  const _page = (page || "").trim();
+  const _page = typeof page === "string" ? page.trim() : "";
   const _topic = (topic || "").trim();
 
   const header = status
