@@ -65,14 +65,13 @@ function detectContentType({ images = [], videos = [], text }) {
 
 async function handleListenerMessage({
   chatIdToReply,
-  text,
+  text = "",
   images = [],
   videos = [],
 } = {}) {
   const cid = toStr(chatIdToReply);
   const t = toStr(text);
   if (!cid) throw new Error("handleListenerMessage: chatId is required");
-  if (!t) return null;
 
   const cfg = (await getChannelConfig(cid)) || {};
   const listen = cfg?.listen;
