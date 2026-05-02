@@ -84,6 +84,7 @@ function buildPublishItem(item) {
     title: smartCutTitle(item.title || ""),
     link: item.link || "",
     guid: item.guid || item.id || item.link || "",
+    categories: item.categories || [],
     publishedAt: item.isoDate || item.pubDate || "",
     html: (item.contentEncoded || "").trim(), // full HTML
     snippet: (item.contentSnippet || cleanSummary(item.summary) || "").trim(),

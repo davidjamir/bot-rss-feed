@@ -139,6 +139,7 @@ function removeLinks(text) {
 function formatItem(item, feedTitle = "", feedUrl = "") {
   const rawTitle = toStr(item.title || "New post");
   const title = esc(cutWithDots(removeLinks(rawTitle), TG_LIMITS.title));
+  const categories = item.categories ?? [];
 
   const link = (item.link || "").trim();
   const safeLink = link ? cutWithDots(link, TG_LIMITS.link) : "";
@@ -165,7 +166,6 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
   else lines.push(`<b>${title}</b>`);
 
   if (desc) lines.push(desc);
-
   if (safeLink) lines.push(`LINK: ${safeLink}`);
   if (when) lines.push(`<i>🕒 ${esc(when)}</i>`);
   // meta
@@ -179,6 +179,7 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
 
   // last line: feed link
   if (feedUrl) lines.push(`<i>Feed: ${esc(breakAutoLinks(feedUrl))}</i>`);
+  if (categories) categories.join(" | ");
   if (badge) lines.push(`<b>${badge}</b>`);
 
   let msg = lines.join("\n");
