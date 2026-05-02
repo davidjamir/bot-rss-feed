@@ -92,11 +92,10 @@ async function saveChannelConfig(chatId, config) {
   const db = await getDb();
   const collection = db.collection(channelCollectionName);
   const chatInfo = await getTelegramChannel(chatId);
-  console.log("Info: ", chatInfo);
 
   const safe = {
-    chatName: chatInfo?.title | "",
-    chatType: chatInfo?.type | "",
+    chatName: chatInfo?.title ?? "",
+    chatType: chatInfo?.type ?? "",
     feeds: Array.isArray(config.feeds) ? config.feeds : [],
     last: config.last && typeof config.last === "object" ? config.last : {},
     api: config.api && typeof config.api === "object" ? config.api : {},
