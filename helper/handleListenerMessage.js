@@ -84,6 +84,8 @@ async function handleListenerMessage({
 
   const payload = {
     chatId: cid,
+    chatName: cfg?.chatName,
+    chatType: cfg?.chatType,
     flags,
     tags,
     topics,

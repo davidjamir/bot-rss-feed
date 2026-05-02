@@ -48,6 +48,8 @@ async function getChannelConfig(chatId) {
 
   if (!config) {
     return {
+      chatName: "",
+      chatType: "",
       feeds: [],
       last: {},
       api: {},
@@ -62,12 +64,38 @@ async function getChannelConfig(chatId) {
   return config;
 }
 
+async function getTelegramChannel(chatId) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const res = await fetch(
+      `https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`,
+      { signal: controller.signal },
+    );
+
+    const data = await res.json();
+    if (!data.ok) {
+      throw new Error(data.description);
+    }
+    return data.result;
+  } catch (err) {
+    throw new Error(`Telegram API error: ${err.message}`);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Lưu thông tin channel vào MongoDB
 async function saveChannelConfig(chatId, config) {
   const db = await getDb();
   const collection = db.collection(channelCollectionName);
+  const chatInfo = await getTelegramChannel(chatId);
 
   const safe = {
+    chatName: chatInfo?.title | "",
+    chatType: chatInfo?.type | "",
     feeds: Array.isArray(config.feeds) ? config.feeds : [],
     last: config.last && typeof config.last === "object" ? config.last : {},
     api: config.api && typeof config.api === "object" ? config.api : {},
