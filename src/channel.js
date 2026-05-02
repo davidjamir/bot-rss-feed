@@ -92,6 +92,7 @@ async function saveChannelConfig(chatId, config) {
   const db = await getDb();
   const collection = db.collection(channelCollectionName);
   const chatInfo = await getTelegramChannel(chatId);
+  console.log("Info: ", chatInfo);
 
   const safe = {
     chatName: chatInfo?.title | "",
