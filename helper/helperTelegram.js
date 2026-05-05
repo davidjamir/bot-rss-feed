@@ -179,7 +179,7 @@ function formatItem(item, feedTitle = "", feedUrl = "") {
 
   // last line: feed link
   if (feedUrl) lines.push(`<i>Feed: ${esc(breakAutoLinks(feedUrl))}</i>`);
-  if (categories) categories.join(" | ");
+  if (categories) lines.push(`Categories: ${categories.join(" | ")}`);
   if (badge) lines.push(`<b>${badge}</b>`);
 
   let msg = lines.join("\n");
